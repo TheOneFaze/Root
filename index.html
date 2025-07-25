@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSCE Spark</title>
+
+    <link rel="apple-touch-icon" href="/OSCE-Prep-Dark/apple-touch-icon.png">
+    <link rel="manifest" href="/OSCE-Prep-Dark/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE Page/login.html';
+        }
+        // The 'isAuthenticated' flag will persist in sessionStorage until the tab/PWA is closed.
+    </script>
+
+    <style>
+/* --- MASTER INLINE STYLES --- */
+
+/* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+html, body {
+    height: 100%; /* Ensure both html and body take full height of the viewport */
+    margin: 0;
+    padding: 0; /* Remove default browser padding/margin */
+    overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+}
+
+/* --- 1. Main Site Layout & Structure --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f4f9; /* Default light background */
+    color: #333; /* Default light text color */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.header-container { /* Original header-container */
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 25px 10px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to right, #42a5f5, #0d47a1); /* Default blue theme gradient for header */
+    position: relative; /* Essential for absolute positioning of search icon */
+    box-sizing: border-box;
+    display: flex; /* Use flexbox to align content within header */
+    justify-content: space-between; /* Change to space-between to push items to ends */
+    align-items: center; /* Vertically center content */
+    flex-wrap: nowrap; /* Prevent wrapping initially */
+    height: 130px; /* Fixed height to accommodate logo and search */
+    padding: 0 15px; /* Add padding to sides for spacing - ADJUSTED */
+}
+
+.logo {
+    max-width: 100%; /* Keep this to ensure it scales down */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 35px; /* Significantly reduce default max-height for all screens - ADJUSTED */
+    display: block; /* Important for flex-item behavior */
+    flex-shrink: 0; /* Prevent logo from shrinking */
+    /* Add horizontal margin to separate it from other elements - ADJUSTED */
+    margin: 0 15px; /* Top/Bottom 0, Left/Right 15px */
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Smooth transition for hiding */
+}
+/* Re-center logo for larger screens */
+@media screen and (min-width: 769px) {
+    .logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0; /* Remove horizontal margin when absolutely positioned - ADJUSTED */
+    }
+}
+
+
+/* --- Search Bar Styling (Universal: Starts as Icon, Expands on Click) --- */
+
+/* The outer container of the search bar (collapsed state) */
+.search-container {
+    position: relative; /* Change from absolute to relative to flow with flexbox */
+    z-index: 100;
+
+    width: 40px; /* Initial width for icon only */
+    height: 40px; /* Fixed height */
+    
+    display: flex; /* Flex container for icon and input */
+    align-items: center;
+    justify-content: flex-end; /* Align icon/input to the right edge */
+    
+    background-color: transparent; /* No background in collapsed state */
+    border: none; /* No border in collapsed state */
+    border-radius: 25px; /* Prepare for expanded state */
+    box-shadow: none; /* No shadow in collapsed state */
+    
+    transition: all 0.3s ease; /* Transition for all properties */
+}
+
+/* State when search input is active/expanded (Desktop Specific) */
+.search-container.active {
+    position: absolute; /* IMPORTANT: Ensure this is absolute to header-container */
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%; /* This will now correctly span the full width of the header-container */
+    height: 100%; /* This will now correctly span the full height of the header-container */
+    
+    background-color: #ffffff; /* White background for expanded bar */
+    border-radius: 0; /* Make it sharp corners for full page span */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 2px solid #42a5f5; /* Border for expanded bar */
+    justify-content: flex-start; /* Move icon to left, input expands right */
+    z-index: 200; /* Ensure it's on top */
+}
+
+.search-icon-wrapper { /* Magnifying glass icon wrapper (always visible) */
+    display: flex; /* Always flex to center icon */
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Fixed width for the icon area */
+    height: 40px; /* Fixed height for the icon area */
+    cursor: pointer;
+    flex-shrink: 0;
+    pointer-events: auto; /* Ensure clickable */
+}
+
+.search-icon { /* SVG styling */
+    width: 28px;
+    height: 28px;
+    fill: white; /* Default: Icon color, visible on header gradient (when collapsed) */
+    transition: fill 0.3s ease; /* Smooth color change */
+    pointer-events: auto; /* Ensure clickable */
+}
+
+/* FIX: Make icon dark when search is active AND NOT dark mode */
+.search-container.active .search-icon {
+    fill: #0d47a1; /* Icon color when expanded (LIGHT MODE: dark blue on white background) */
+}
+
+/* No change needed for .dark-mode .search-icon as it's correctly #82b1ff */
+
+
+#searchInput {
+    display: block; /* Always 'block' for transition */
+    width: 0; /* Hidden by default */
+    padding: 0; /* No padding initially */
+    border: none; /* No border initially */
+    font-size: 1em;
+    outline: none;
+    background-color: transparent; /* Transparent so container's background shows */
+    color: #333; /* Text color */
+    box-sizing: border-box; /* Include padding/border in width */
+    opacity: 0;
+    pointer-events: none; /* Disable interaction when hidden */
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease, margin-left 0.3s ease;
+}
+
+.search-container.active #searchInput {
+    width: calc(100% - 40px - 10px); /* Fill remaining space */
+    padding: 10px 15px; /* Add padding */
+    opacity: 1; /* Make visible */
+    pointer-events: auto; /* Enable interaction */
+    margin-left: 10px; /* Space between icon and input */
+}
+
+#searchInput:focus {
+    /* No additional styling on focus, container handles it */
+}
+
+
+/* --- Container and Card Styles --- */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.card { /* Styling for ALL cards */
+    background-color: #ffffff;
+    padding: 20px;
+    width: 280px;
+    min-height: 80px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, opacity 0.3s, visibility 0.3s, height 0.3s, padding 0.3s, margin 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 5px solid transparent; /* This will be overridden by theme-specific classes */
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .card a {
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+        display: block;
+        width: 100%;
+    }
+
+/* Hidden state for cards */
+.card.hidden {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+    display: none; /* Crucially, set display to none to remove it from flex layout */
+}
+
+p.no-results {
+    text-align: center;
+    font-size: 1.2em;
+    color: #666;
+    padding: 50px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    display: none;
+}
+
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Dark Mode Toggle Slider Styles */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-bottom: 0; REMOVED as it's no longer in footer */
+    flex-shrink: 0; /* Prevent it from shrinking - ADJUSTED */
+    padding-right: 10px; /* Add some padding to the right of the switch - ADJUSTED */
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #03a9f4;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #03a9f4;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* --- 2. Color Themes for LIGHT Mode --- */
+/* Base theme colors for header, h1, h2, a */
+.theme-blue header, .theme-blue h1, .theme-blue h2, .theme-blue a { color: #0d47a1; }
+.theme-green header, .theme-green h1, .theme-green h2, .theme-green a { color: #1b5e20; }
+.theme-orange header, .theme-orange h1, .theme-orange h2, .theme-orange a { color: #e65100; }
+.theme-purple header, .theme-purple h1, .theme-purple h2, .theme-purple a { color: #4a148c; }
+.theme-red header, .theme-red h1, .theme-red h2, .theme-red a { color: #b71c1c; }
+.theme-terracotta header, .theme-terracotta h1, .theme-terracotta h2, .theme-terracotta a { color: #bf360c; }
+.theme-teal header, .theme-teal h1, .theme-teal h2, .theme-teal a { color: #004d40; }
+.theme-pink header, .theme-pink h1, .theme-pink h2, .theme-pink a { color: #ad1457; }
+
+/* Section box backgrounds */
+.theme-blue .section-box { background: #e3f2fd; }
+.theme-green .section-box { background: #e8f5e9; }
+.theme-orange .section-box { background: #fff3e0; }
+.theme-purple .section-box { background: #f3e5f5; }
+.theme-red .section-box { background: #ffebee; }
+.theme-terracotta .section-box { background: #fff3e0; }
+.theme-teal .section-box { background: #e0f2f1; }
+.theme-pink .section-box { background: #fce4ec; }
+
+/* h3 colors and border-colors */
+.theme-blue h3 { color: #0d47a1; border-color: #42a5f5; }
+.theme-green h3 { color: #1b5e20; border-color: #66bb6a; }
+.theme-orange h3 { color: #e65100; border-color: #ffb74d; }
+.theme-purple h3 { color: #4a148c; border-color: #ce93d8; }
+.theme-red h3 { color: #b71c1c; border-color: #ef5350; }
+.theme-terracotta h3 { color: #bf360c; border-color: #ffab91; }
+.theme-teal h3 { color: #004d40; border-color: #4db6ac; }
+.theme-pink h3 { color: #ad1457; border-color: #f06292; }
+
+/* Header container gradients */
+.theme-blue .header-container { background: linear-gradient(to right, #42a5f5, #0d47a1); }
+.theme-green .header-container { background: linear-gradient(to right, #66bb6a, #1b5e20); }
+.theme-orange .header-container { background: linear-gradient(to right, #ffb74d, #e65100); }
+.theme-purple .header-container { background: linear-gradient(to right, #ce93d8, #4a148c); }
+.theme-red .header-container { background: linear-gradient(to right, #ef5350, #b71c1c); }
+.theme-terracotta .header-container { background: linear-gradient(to right, #ffab91, #bf360c); }
+.theme-teal .header-container { background: linear-gradient(to right, #4db6ac, #004d40); }
+.theme-pink .header-container { background: linear-gradient(to right, #f06292, #ad1457); }
+
+/* Card border-colors - Apply to both main and sub-topic cards */
+.card.history-taking { border-color: #b71c1c; } /* Red for History Taking */
+.card.diagnosis { border-color: #29b6f6; } /* Blue for Diagnosis */
+.card.medication { border-color: #66bb6a; } /* Green for Medication */
+.card.procedure { border-color: #ffa726; } /* Orange for Procedure */
+.card.post-procedure { border-color: #ab47bc; } /* Purple for Post-Procedure */
+.card.surgery { border-color: #ef5350; } /* Red for Surgery */
+.card.community { border-color: #ff7043; } /* Terracotta for Community */
+
+/* Toggle switch active colors */
+.theme-blue .toggle-label.active, .theme-blue .toggle-container .switch.active { background-color: #42a5f5; }
+.theme-green .toggle-label.active, .theme-green .toggle-container .switch.active { background-color: #66bb6a; }
+.theme-orange .toggle-label.active, .theme-orange .toggle-container .switch.active { background-color: #ffa726; }
+.theme-purple .toggle-label.active, .theme-purple .toggle-container .switch.active { background-color: #ab47bc; }
+.theme-red .toggle-label.active, .theme-red .toggle-container .switch.active { background-color: #ef5350; }
+.theme-terracotta .toggle-label.active, .theme-terracotta .toggle-container .switch.active { background-color: #ff7043; }
+.theme-teal .toggle-label.active, .theme-teal .toggle-container .switch.active { background-color: #4db6ac; }
+.theme-pink .toggle-label.active, .theme-pink .toggle-container .switch.active { background-color: #f48fb1; }
+
+
+/* --- 3. Dark Mode Styles --- */
+body.dark-mode {
+    background: #1f2023;
+    color: #e0e0e0;
+}
+
+.dark-mode .card, .dark-mode .content-section {
+    background-color: #2f3136;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.dark-mode .section-box {
+    background-color: #2a2c30;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.dark-mode a {
+    color: #e0e0e0;
+}
+.dark-mode footer {
+    color: #999;
+}
+.dark-mode h1, .dark-mode h2 {
+    color: #e0e0e0;
+}
+.dark-mode p, .dark-mode li {
+    color: #cccccc;
+}
+.dark-mode header {
+    color: white;
+}
+
+/* Dark Mode Header Background */
+.dark-mode .header-container {
+    background: linear-gradient(to right, #0d47a1, #1a237e);
+}
+
+/* Dark Mode Search Bar Styling */
+.dark-mode .search-container.active {
+    background-color: #3f4147;
+    border: 2px solid #82b1ff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.dark-mode .search-container.active #searchInput {
+    color: #e0e0e0;
+}
+
+.dark-mode .search-icon {
+    fill: #82b1ff;
+}
+
+/* Dark Mode Card Borders - Apply to both main and sub-topic cards */
+.dark-mode .card.history-taking { border-color: #ff8a80; } /* Lighter red for History Taking */
+.dark-mode .card.diagnosis { border-color: #82b1ff; } /* Lighter blue for Diagnosis */
+.dark-mode .card.medication { border-color: #a5d6a7; } /* Lighter green for Medication */
+.dark-mode .card.procedure { border-color: #ffcc80; } /* Lighter orange for Procedure */
+.dark-mode .card.post-procedure { border-color: #e1bee7; } /* Lighter purple for Post-Procedure */
+.dark-mode .card.surgery { border-color: #ff8a80; } /* Lighter red for Surgery */
+.dark-mode .card.community { border-color: #ffccbc; } /* Lighter terracotta for Community */
+
+.dark-mode p.no-results {
+    color: #aaa;
+}
+
+/* --- 4. Media Queries for Mobile-Friendly Layout --- */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    .card {
+        width: 45%;
+    }
+
+    /* Mobile Header Layout (No change from desktop, simplified by flexbox) */
+    .header-container {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        flex-direction: row; /* Keep logo and search on one row initially */
+        justify-content: space-between;
+        align-items: center;
+        height: auto; /* Dynamic height */
+        flex-wrap: nowrap;
+    }
+
+    .logo {
+        margin: 0 10px; /* Adjust margin for mobile - ADJUSTED */
+        max-height: 30px; /* Further reduce for tablets/larger phones - ADJUSTED */
+        flex-shrink: 0;
+        position: static; /* Remove absolute positioning for mobile */
+        transform: none;
+    }
+
+    /* Hide the logo when search is active on mobile */
+    .logo.hidden-on-search-active {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+        width: 0; /* Collapse width */
+        margin: 0; /* Ensure no space taken */
+    }
+
+    /* Mobile Search Bar Behavior */
+    .search-container {
+        position: relative; /* Change from absolute to relative for mobile */
+        width: 40px; /* Start as just the icon width */
+        height: 40px; /* Start as just the icon height */
+        overflow: hidden; /* Hide overflowing input */
+        transition: width 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, border 0.3s ease, border-radius 0.3s ease, 
+                    top 0.3s ease, left 0.3s ease, right 0.3s ease, transform 0.3s ease, height 0.3s ease; /* Added position transitions for mobile */
+        flex-shrink: 0;
+        justify-content: flex-end; /* Align icon to the right */
+    }
+
+    .search-container.active { /* State when search input is open/active */
+        width: calc(100% - 40px); /* Expand within the available header space */
+        position: absolute; /* Takes absolute positioning for expansion */
+        top: 50%; /* Center vertically within the header */
+        transform: translateY(-50%);
+        left: 20px; /* Start from left with padding */
+        right: 20px; /* Expand to right with padding */
+        margin: auto; /* Center horizontally */
+        border-radius: 25px; /* Keep consistent rounding */
+    }
+    
+    .search-icon-wrapper {
+        display: flex; /* Show icon wrapper */
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease, margin-right 0.3s ease;
+    }
+
+    .search-container.active .search-icon-wrapper {
+        margin-right: 10px; /* Space between icon and input when expanded */
+    }
+
+    #searchInput {
+        width: 0; /* Hidden by default on mobile */
+        padding: 10px 0px; /* No padding initially */
+        opacity: 0;
+        pointer-events: none; /* Disable interaction when hidden */
+        flex-grow: 1; /* Allow it to grow when active */
+    }
+
+    .search-container.active #searchInput {
+        width: calc(100% - 40px - 10px); /* Fill remaining space, minus icon and margin */
+        padding: 10px 15px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+
+    /* This rule makes the search-container cover the whole header when active */
+    .search-container.active {
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        z-index: 200 !important;
+    }
+
+    .search-container.active .search-icon-wrapper {
+        margin-left: 15px;
+        margin-right: 10px;
+    }
+
+    .search-container.active #searchInput {
+        width: 100% !important;
+        padding: 20px 15px !important;
+        margin-left: 10px;
+    }
+
+/* New class to hide elements when search is active */
+.hidden-on-search-active {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    width: 0; /* Collapse width */
+    margin: 0; /* Ensure no space taken */
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    .card {
+        width: 100%;
+    }
+
+    .content-section {
+        padding: 20px;
+        margin: 0 auto 30px;
+    }
+
+    .section-box {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.1em;
+    }
+}
+    
+@media screen and (max-width: 600px) {
+    .logo {
+        max-height: 25px; /* Smaller logo for small screens - ADJUSTED */
+        margin: 0 8px; /* Further adjust margin - ADJUSTED */
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .logo {
+        max-height: 20px; /* Extra small logo for very narrow screens - ADJUSTED */
+        margin: 0 5px; /* Minimal margin for very small screens - ADJUSTED */
+    }
+}
+
+
+/* Fully Custom Sun/Moon Toggle Switch - Fixed Paths & Stronger Visibility */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 40px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 34px;
+    background-image: url('/OSCE-Prep-Dark/OSCE Page/sun-toggle-final.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    box-shadow: inset 0 0 0 1px #444; /* Help outline the toggle */
+    transition: 0.4s ease-in-out;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 30px;
+    width: 30px;
+    left: 4px;
+    bottom: 5px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+input:checked + .slider {
+    background-image: url('/OSCE-Prep-Dark/OSCE Page/moon-toggle-final.png');
+    background-position: center center;
+    background-size: cover;
+}
+
+input:checked + .slider:before {
+    transform: translateX(40px);
+}
+
+
+@media (max-width: 768px) {
+    .site-logo-container img {
+        max-height: 18px !important;
+        margin-left: 6px !important;
+        margin-right: 8px !important;
+    }
+}
+
+</style>
+</head>
+<body class="theme-blue">
+<main>
+
+    <div class="header-container">
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="darkModeToggle">
+                <input type="checkbox" id="darkModeToggle" />
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <img src="/OSCE-Prep-Dark/OSCE Page/OSCE SPARK.png" alt="OSCE Spark Logo" class="logo">
+        <div class="search-container">
+            <div class="search-icon-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search OSCE topics...">
+        </div>
+    </div>
+
+    <div id="all-cards-container" class="container">
+        <div class="card history-taking main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_history_taking.html">🧠 History Taking</a></div>
+        <div class="card diagnosis main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations.html">💡 Diagnosis Stations</a></div>
+        <div class="card medication main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations.html">💊 Medication Stations</a></div>
+        <div class="card procedure main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations.html">🔧 Procedure Stations</a></div>
+        <div class="card post-procedure main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_post-procedure__stations.html">🔁 Post-Procedure Stations</a></div>
+        <div class="card surgery main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_surgery_stations.html">🩺 Surgery Stations</a></div>
+        <div class="card community main-category-card"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations.html">🏘️ Community Stations</a></div>
+
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Abdominal Pain.html">Abdominal Pain</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Anxiety.html">Anxiety</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Breast Lump.html">Breast Lump</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Cardiovascular.html">Cardiovascular</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Chest Pain.html">Chest Pain</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Cough.html">Cough</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Depression.html">Depression</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Dizziness History.html">Dizziness History</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Dysphagia.html">Dysphagia</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Dyspnoea.html">Dyspnoea</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Falls.html">Falls</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Female LUTS.html">Female LUTS</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Headache.html">Headache</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Leg Swelling.html">Leg Swelling</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Loss of Consciousness.html">Loss of Consciousness</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Male LUTS.html">Male LUTS</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Ophthalmic.html">Ophthalmic</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Palpitations.html">Palpitations</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Respiratory.html">Respiratory</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Seizure.html">Seizure</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Stroke-TIA.html">Stroke-TIA</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Tiredness.html">Tiredness</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Unintentional Weight Loss.html">Unintentional Weight Loss</a></div>
+        <div class="card history-taking sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/History Taking/Urological.html">Urological</a></div>
+
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/alcohol_cessation_counselling.html">Alcohol Cessation Counselling</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/bowel_cancer_screening_counselling.html">Bowel Cancer Screening</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/community_blood_pressure_check.html">Community Blood Pressure Check</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/dnacpr_counselling.html">DNACPR Counselling</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/hypertension_counselling.html">Hypertension Counselling</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/inhaler_technique_counselling.html">Inhaler Technique Counselling</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/peak_flow_counselling.html">Peak Flow (PEFR) Technique</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/smoking_cessation_counselling.html">Smoking Cessation Counselling</a></div>
+        <div class="card community sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_community_stations/weight_loss_counselling.html">Weight Loss Counselling</a></div>
+
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/atrial_fibrillation_counselling.html">Atrial Fibrillation Counselling</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/bacterial_vaginosis_counselling.html">Bacterial Vaginosis Counselling</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/chronic_kidney_disease_counselling.html">Chronic Kidney Disease Counselling</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_a_diagnosis_of_asthma.html">Explaining a Diagnosis of Asthma</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_copd.html">Explaining a Diagnosis of COPD</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_eczema.html">Explaining a Diagnosis of Eczema</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_fibroadenoma.html">Explaining a Diagnosis of Fibroadenoma</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_glaucoma.html">Explaining a Diagnosis of Glaucoma</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_type1_diabetes.html">Explaining a Diagnosis of Type 1 Diabetes</a></div>
+        <div class="card diagnosis sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_diagnosis_stations/explaining_diagnosis_type2_diabetes.html">Explaining a Diagnosis of Type 2 Diabetes</a></div>
+
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/ace_inhibitor_counselling.html">ACE-Inhibitor Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/amitriptyline_counselling.html">Amitriptyline Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/anticoagulant_counselling_pharmacy.html">Anticoagulant Counselling | Pharmacy</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/asthma_spacer_explanation.html">Asthma Spacer Explanation</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/direct_oral_anticoagulant_counselling.html">Direct Oral Anticoagulant Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/gliclazide_counselling.html">Gliclazide Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/gtn_spray_counselling.html">GTN Spray Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/inhaler_counselling_01_pharmacy.html">Inhaler Counselling 01 | Pharmacy</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/inhaler_counselling_02_pharmacy.html">Inhaler Counselling 02 | Pharmacy</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/insulin_counselling.html">Insulin Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/iron_supplementation_counselling.html">Iron Supplementation Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/metformin_counselling.html">Metformin Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/opioid_analgesia_counselling.html">Opioid Analgesia Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/ssri_counselling.html">SSRI Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/statin_counselling.html">Statin Counselling</a></div>
+        <div class="card medication sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_medication_stations/warfarin_counselling.html">Warfarin Counselling</a></div>
+
+        <div class="card post-procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_post-procedure__stations/post_stemi_counselling.html">Post-STEMI Counselling</a></div>
+        <div class="card post-procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_post-procedure__stations/post_stroke_counselling.html">Post-stroke Counselling</a></div>
+
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/ascitic_drain_explanation.html">Ascitic drain explanation</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/blood_transfusion_counselling.html">Blood transfusion counselling</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/bronchoscopy_counselling.html">Bronchoscopy Counselling</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/chest_drain_explanation.html">Chest drain explanation</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/colonoscopy_explanation.html">Colonoscopy explanation</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/echocardiogram_explanation.html">Echocardiogram explanation</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/endoscopy_counselling.html">Endoscopy counselling</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/ercp_explanation.html">ERCP explanation</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/haemodialysis_counselling.html">Haemodialysis Counselling</a></div>
+        <div class="card procedure sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_procedure_stations/tuberculosis_treatment_counselling.html">Tuberculosis treatment counselling</a></div>
+
+        <div class="card surgery sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_surgery_stations/appendicectomy_counselling.html">Appendicectomy Counselling</a></div>
+        <div class="card surgery sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_surgery_stations/cabg_counselling.html">Coronary Artery Bypass Graft (CABG) Counselling</a></div>
+        <div class="card surgery sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_surgery_stations/cholecystectomy_counselling.html">Cholecystectomy Counselling</a></div>
+        <div class="card surgery sub-topic-card hidden"><a href="/OSCE-Prep-Dark/OSCE Page/Main Page/pretty_surgery_stations/gastrectomy_counselling.html">Gastrectomy Counselling</a></div>
+        <p class="no-results">No results found.</p>
+    </div>
+
+</main>
+<footer>
+    Made with ❤️ for OSCE preparation (V0.2.1.14)
+</footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages) - Kept globally scoped as before
+    window.toggleSwitch = function(switchEl) {
+        const isActive = switchEl.classList.toggle('active');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+
+        if (highYieldLabel) highYieldLabel.classList.toggle('active', !isActive);
+        if (fullScriptLabel) fullScriptLabel.classList.toggle('active', isActive);
+        if (highYieldContent) highYieldContent.classList.toggle('active', !isActive);
+        if (fullScriptContent) fullScriptContent.classList.add('active');
+        if (fullScriptContent) fullScriptContent.classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) {
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            if (highYieldContent) highYieldContent.classList.add('active');
+            if (fullScriptContent) fullScriptContent.classList.remove('active');
+            if (highYieldLabel) highYieldLabel.classList.add('active');
+            if (fullScriptLabel) fullScriptLabel.classList.remove('active');
+            if (switchEl) switchEl.classList.remove('active');
+        } else {
+            if (highYieldContent) highYieldContent.classList.remove('active');
+            if (fullScriptContent) fullScriptContent.classList.add('active');
+            if (highYieldLabel) highYieldLabel.classList.remove('active');
+            if (fullScriptLabel) fullScriptLabel.classList.add('active');
+            if (switchEl) switchEl.classList.add('active');
+        }
+    }
+
+    const headerContainer = document.querySelector('.header-container');
+    const searchContainer = document.querySelector('.search-container');
+    const searchIconWrapper = document.querySelector('.search-icon-wrapper');
+    const searchIcon = document.querySelector('.search-icon');
+    const searchInput = document.getElementById('searchInput');
+    const allCardsContainer = document.getElementById('all-cards-container');
+    const mainCategoryCards = document.querySelectorAll('.main-category-card');
+    const subTopicCards = document.querySelectorAll('.sub-topic-card'); 
+    const noResultsMessage = document.querySelector('.no-results');
+    const logo = document.querySelector('.logo');
+    const themeSwitchWrapper = document.querySelector('.theme-switch-wrapper'); // Get reference to the theme switch wrapper
+
+    // Flag to track if events should be ignored temporarily (e.g., after opening search)
+    let ignoreEventsTemporarily = false; 
+
+    // Function to hide all cards and the "no results" message
+    const hideAllCardsAndMessage = () => {
+        mainCategoryCards.forEach(card => card.classList.add('hidden'));
+        subTopicCards.forEach(card => card.classList.add('hidden'));
+        noResultsMessage.style.display = 'none';
+    };
+
+    // Function to show only main category cards
+    const showMainCategories = () => {
+        hideAllCardsAndMessage(); // Hide everything first
+        mainCategoryCards.forEach(card => card.classList.remove('hidden'));
+    };
+
+    // Initial state: show main categories
+    showMainCategories();
+
+    // Event listener for search input
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase().trim(); // Get and clean search term
+        hideAllCardsAndMessage(); // Hide all cards and message initially
+
+        if (searchTerm.length > 1) { // Only search if more than one character
+            let resultsFound = false;
+
+            subTopicCards.forEach(card => {
+                const title = card.textContent.toLowerCase();
+                const href = card.querySelector('a')?.getAttribute('href')?.toLowerCase() || '';
+                const filename = href.split('/').pop().replace('.html', ''); // Extract filename for search
+
+                // Check if search term is in card title, href, or filename
+                if (title.includes(searchTerm) || href.includes(searchTerm) || filename.includes(searchTerm)) {
+                    card.classList.remove('hidden'); // Show matching sub-topic card
+                    resultsFound = true;
+                }
+            });
+
+            if (!resultsFound) {
+                noResultsMessage.style.display = 'block'; // Show "No results" message if no matches
+            }
+        } else {
+            // If search term is empty or too short, show main categories
+            showMainCategories();
+        }
+    });
+    
+    // Event listener for search icon click
+    if (searchIconWrapper) {
+        searchIconWrapper.addEventListener('click', (event) => {
+            // Prevent the click from propagating to the document immediately
+            event.stopPropagation(); 
+
+            const isActivating = !searchContainer.classList.contains('active');
+            searchContainer.classList.toggle('active');
+
+            if (isActivating) { // Search bar is opening
+                ignoreEventsTemporarily = true; // Start ignoring events
+                searchInput.focus(); // Focus immediately
+
+                // Hide logo and theme switch when search is active
+                logo.classList.add('hidden-on-search-active'); 
+                if (themeSwitchWrapper) { // Hide theme switch
+                    themeSwitchWrapper.classList.add('hidden-on-search-active');
+                }
+                if (window.innerWidth <= 992) { // Lock body scroll on mobile
+                    document.body.classList.add('no-scroll'); 
+                }
+                
+                // If search input already has text, re-trigger search on activation
+                if (searchInput.value.length > 1) {
+                    searchInput.dispatchEvent(new Event('input'));
+                } else {
+                    hideAllCardsAndMessage(); // Clear results if search is activated empty
+                }
+
+                // Stop ignoring events after a brief period
+                setTimeout(() => {
+                    ignoreEventsTemporarily = false;
+                }, 700); // Increased delay to 700ms for robust keyboard handling
+            } else { // Search bar is closing
+                // No need to set ignoreEventsTemporarily here, as it's for opening.
+                searchInput.value = '';
+                searchInput.blur(); // Blur the input when closing
+                showMainCategories();
+                // Show logo and theme switch when search closes
+                logo.classList.remove('hidden-on-search-active'); 
+                if (themeSwitchWrapper) { // Show theme switch
+                    themeSwitchWrapper.classList.remove('hidden-on-search-active');
+                }
+                if (window.innerWidth <= 992) { // Unlock body scroll on mobile
+                    document.body.classList.remove('no-scroll'); 
+                }
+            }
+        });
+    }
+
+    // MutationObserver to re-add 'active' class if it's removed unexpectedly (e.g., by keyboard layout shifts)
+    const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                // If 'active' class was removed AND search input is still focused
+                if (!searchContainer.classList.contains('active') && document.activeElement === searchInput) {
+                    // Re-add 'active' class
+                    searchContainer.classList.add('active');
+                    // Re-hide logo and theme switch if they were hidden
+                    if (logo.classList.contains('hidden-on-search-active')) {
+                        logo.classList.add('hidden-on-search-active');
+                    }
+                    if (themeSwitchWrapper && themeSwitchWrapper.classList.contains('hidden-on-search-active')) {
+                        themeSwitchWrapper.classList.add('hidden-on-search-active');
+                    }
+                    // Re-focus input (might be redundant but safe)
+                    searchInput.focus();
+                }
+            }
+        }
+    });
+
+    // Start observing the searchContainer for class attribute changes
+    observer.observe(searchContainer, { attributes: true, attributeFilter: ['class'] });
+
+
+    // Handle clicks outside the search bar and visible cards to close search
+    document.addEventListener('click', (event) => {
+        // NEW: If events are temporarily ignored, do nothing.
+        if (ignoreEventsTemporarily) {
+            return; 
+        }
+
+        const isInsideSearchContainer = searchContainer.contains(event.target);
+        const isVisibleCard = event.target.closest('.card:not(.hidden)');
+        
+        // Only close if search container is active, click is outside it, 
+        // AND the search input is NOT the active element (prevents closing when keyboard is up and input is focused)
+        if (searchContainer.classList.contains('active') && !isInsideSearchContainer && document.activeElement !== searchInput) {
+            searchContainer.classList.remove('active');
+            searchInput.value = '';
+            searchInput.blur(); // Explicitly blur when closing via click outside
+            logo.classList.remove('hidden-on-search-active'); // Ensure logo reappears
+            if (themeSwitchWrapper) { // Ensure theme switch reappears
+                themeSwitchWrapper.classList.remove('hidden-on-search-active');
+            }
+            showMainCategories(); // Reset to main categories view
+            if (window.innerWidth <= 992) { 
+                document.body.classList.remove('no-scroll'); // Unlock body scroll
+            }
+        }
+    });
+
+    // MODIFIED: window.addEventListener('resize') to be completely passive when search is active
+    window.addEventListener('resize', () => {
+        // NEW: If events are temporarily ignored, do nothing.
+        if (ignoreEventsTemporarily) {
+            return; 
+        }
+        
+        // If search is NOT active, or if it's active but not user-opened (e.g., initial load or desktop)
+        // then we proceed with the standard reset to handle genuine orientation changes etc.
+        searchContainer.classList.remove('active');
+        searchInput.value = '';
+        showMainCategories();
+        logo.classList.remove('hidden-on-search-active'); // Ensure logo reappears correctly
+        if (themeSwitchWrapper) { // Ensure theme switch reappears
+            themeSwitchWrapper.classList.remove('hidden-on-search-active');
+        }
+        logo.classList.remove('hidden-mobile-logo'); // Ensure this is also handled
+        if (window.innerWidth <= 992) { 
+            document.body.classList.remove('no-scroll'); // Restore body scrolling
+        }
+    });
+
+    // Initial display update on load
+    const updateSearchDisplay = () => {
+        searchContainer.classList.remove('active');
+        searchInput.value = '';
+        showMainCategories();
+        logo.classList.remove('hidden-on-search-active'); // Ensure logo is visible on initial load
+        if (themeSwitchWrapper) { // Ensure theme switch is visible on initial load
+            themeSwitchWrapper.classList.remove('hidden-on-search-active');
+        }
+        logo.classList.remove('hidden-mobile-logo'); // Also ensure this is handled on load
+        if (window.innerWidth <= 992) { 
+            document.body.classList.remove('no-scroll'); // Ensure body scrolling is enabled on load
+        }
+    };
+
+    window.addEventListener('resize', updateSearchDisplay); // Re-attach resize listener
+    updateSearchDisplay(); // Call on initial load to set correct display
+});
+</script>
+<script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE Page/login.html';
+        }
+        // The 'isAuthenticated' flag will persist in sessionStorage until the tab/PWA is closed.
+    </script>
+</body>
+</html>
