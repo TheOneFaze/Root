@@ -1,7 +1,7 @@
 const CACHE_NAME = 'osce-prep-cache-v1';
 const urlsToCache = [
   // Core HTML file
-  '/OSCE-Prep-Dark/OSCE%20Page/index.html', //
+  '/index.html', //
 
   // The new authentication check script
   '/OSCE-Prep-Dark/OSCE%20Page/auth-check.js', //
