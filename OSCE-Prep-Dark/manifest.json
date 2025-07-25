@@ -2,7 +2,7 @@
   "name": "OSCE Spark",
   "short_name": "OSCE Spark",
   "description": "Your comprehensive OSCE preparation checklist app.",
-  "start_url": "/OSCE-Prep-Dark/OSCE%20Page/index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#f4f4f9",
   "theme_color": "#42a5f5",
