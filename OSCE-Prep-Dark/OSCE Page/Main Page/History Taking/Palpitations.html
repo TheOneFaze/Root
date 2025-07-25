@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Palpitations History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #e6f0f5; /* Light, calming blue-grey for background */
+        color: #31404e; /* Darker blue-grey for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #3b5c7a; /* Deeper muted blue for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #4e728f; /* A slightly lighter, calming blue for subheadings */
+      border-left: 5px solid #5a8bb0; /* Matches the darker blue from the header gradient */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #7cb3d4; /* Muted medium blue for active label */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #7cb3d4; /* Muted medium blue when on */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #31404e; /* Default text color for labels */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #5a8bb0; /* Darker muted blue for checked background */
+        border-color: #5a8bb0; /* Darker muted blue for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-blue-grey based on existing colors */
+    .theme-blue-grey body {
+        background: #e6f0f5;
+        color: #31404e;
+    }
+    .theme-blue-grey header {
+        color: white;
+        background: linear-gradient(to right, #7cb3d4, #5a8bb0); /* Muted medium blue gradient */
+    }
+    .theme-blue-grey h1, .theme-blue-grey h2, .theme-blue-grey a {
+        color: #3b5c7a; /* Deeper muted blue for section titles */
+    }
+    .theme-blue-grey .section-box {
+        background: white;
+    }
+    .theme-blue-grey h3 {
+        color: #4e728f; /* A slightly lighter, calming blue for subheadings */
+        border-color: #5a8bb0; /* Matches the darker blue from the header gradient */
+    }
+    .theme-blue-grey .toggle-label.active, .theme-blue-grey .toggle-container .switch.active {
+        background-color: #7cb3d4; /* Muted medium blue for active toggle */
+    }
+    .theme-blue-grey .section-box label input[type="checkbox"] {
+        border-color: #5a8bb0;
+    }
+    .theme-blue-grey .section-box label input[type="checkbox"]:checked {
+        background-color: #5a8bb0;
+        border-color: #5a8bb0;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Blue-Grey */
+    .dark-mode.theme-blue-grey header {
+        color: white;
+        background: linear-gradient(to right, #a2ccdd, #7cb3d4); /* Lighter blue-grey gradient for dark mode */
+    }
+    .dark-mode.theme-blue-grey h3, .dark-mode.theme-blue-grey a {
+        color: #a2ccdd; /* Lighter blue-grey for dark mode headings */
+    }
+    .dark-mode.theme-blue-grey .toggle-label.active, .dark-mode.theme-blue-grey .toggle-container .switch.active {
+        background-color: #a2ccdd; /* Lighter blue-grey for dark mode active toggle */
+    }
+    .dark-mode.theme-blue-grey .section-box label input[type="checkbox"] {
+        border-color: #a2ccdd; /* Lighter blue-grey for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-blue-grey .section-box label input[type="checkbox"]:checked {
+        background-color: #a2ccdd; /* Lighter blue-grey for checked background in dark mode */
+        border-color: #a2ccdd;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-blue-grey"> <header>📝 Palpitations History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their palpitations?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about the palpitations (e.g., serious heart condition, sudden collapse)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation (e.g., diagnosis, management, reassurance)?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💓 History of Presenting Complaint (Palpitations-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Description:</strong> <span>Ask the patient to describe the feeling they are experiencing (e.g., heartbeats that are suddenly more noticeable, heart pounding, fluttering, racing, skipping beats, irregular beating, "flip-flopping" sensation).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset & Context:</strong> <span>When did they first start? Sudden or gradual onset? What was the patient doing when they started (e.g., at rest, on exertion, lying down, waking up from sleep, after a sudden movement)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Triggers:</strong> <span>Any obvious triggers (e.g., exertion, position changes, anxiety, stress, emotional upset, caffeine, alcohol, nicotine, recreational drugs, certain foods, sleep deprivation, fever, illness)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Relieving Factors:</strong> <span>Has the patient identified anything that improves or stops the palpitations (e.g., vagal manoeuvres like Valsalva, splash cold water on face, rest, medication)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Rate & Rhythm:</strong> <span>Do the palpitations feel fast or slow? Regular or irregular? Have they ever recorded their pulse rate during an episode?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Duration & Frequency:</strong> <span>How long do individual episodes last (seconds, minutes, hours)? How often do they occur (daily, weekly, monthly)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Adverse Clinical Features:</strong> <span>Have they experienced any associated symptoms like syncope (fainting), pre-syncope (lightheadedness, near-fainting), angina (chest pain), shortness of breath (dyspnoea), palpitations during exercise/exertion, sweating, extreme fatigue, dizziness, or collapse?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms (Underlying Cause):</strong> <span>Screen for features suggesting an underlying cause: chest pain (myocardial infarction), heat intolerance, weight loss, tremor, anxiety (hyperthyroidism), panic attacks, dizziness, vision changes, new neurological symptoms.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions: It is important to ask specifically about pre-existing cardiovascular disease (e.g., heart attack, heart failure, high blood pressure, valve disease, congenital heart disease, arrhythmias), and any cardiovascular risk factors (e.g., diabetes, hyperlipidaemia, obesity). Also, ask about thyroid disease, anaemia, electrolyte imbalances, and mental health issues (e.g., anxiety, depression, panic disorder).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (especially cardiac procedures like ablation, pacemaker insertion, valve surgery).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Any current mental health issues, history of panic attacks or anxiety disorders.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially antiarrhythmics, beta-blockers, diuretics, thyroid hormones, bronchodilators (e.g., salbutamol), nasal decongestants, caffeine-containing products.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Recent medication changes (new medications, recently stopped medications, dose changes).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Any family history of cardiovascular disease, sudden cardiac death (especially at a young age), inherited heart conditions (e.g., long QT syndrome, Brugada syndrome, hypertrophic cardiomyopathy), or arrhythmias in first-degree relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation, social support, ability to manage ADLs, employment.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking history, alcohol intake, recreational drug use (especially stimulants like cocaine, amphetamines, ecstasy), diet and weight, regular exercise (and if palpitations occur during exercise).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Occupation/Driving:</strong> <span>Current occupation. If the patient works at heights or with heavy machinery, advise them they should not return to work until fully investigated. It is important to advise the patient not to drive until they have been fully investigated for their palpitations and cleared by a medical professional/DVLA.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., cardiovascular examination, vital signs, ECG, blood tests - FBC, U&Es, TFTs, glucose, cardiac enzymes, Holter monitoring/event recorder, echocardiogram, exercise tolerance test, referral to cardiology).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today because you've been experiencing palpitations. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing these palpitations, or what they might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💓 Exploring the Palpitations (Palpitations-Specific)</h3>
+        <p>"Could you please describe the feeling you're experiencing in your chest? Do your heartbeats suddenly feel more noticeable? Is it a pounding, fluttering, or racing sensation? Or does it feel like your heart is skipping beats or beating irregularly?"</p>
+        <p>"When did you first start noticing these palpitations? Did they come on very suddenly, or gradually? What were you doing when they started – were you at rest, exercising, lying down, waking up from sleep, or after a sudden movement?"</p>
+        <p>"Have you identified any obvious triggers for your palpitations? For example, does it happen after exertion, when you change position, when you're feeling anxious or stressed? What about after consuming caffeine, alcohol, or nicotine? Does sleep deprivation play a role? Have you noticed them when you're ill or have a fever?"</p>
+        <p>"Have you found anything that improves or stops the palpitations? For example, certain breathing techniques, splashing cold water on your face, resting, or taking any medication?"</p>
+        <p>"Do the palpitations feel fast or slow? Have you ever tried to feel your pulse during an episode and recorded the rate, or noticed if it felt regular or irregular?"</p>
+        <p>"How long do individual episodes of palpitations usually last – just a few seconds, minutes, or do they go on for hours? And how often do they occur – daily, weekly, or monthly?"</p>
+        <p>"Have you experienced any other concerning symptoms with the palpitations? Like feeling faint or actually fainting (syncope)? Or feeling lightheaded or like you're about to pass out (pre-syncope)? Have you had any chest pain (angina), or shortness of breath? Do they occur specifically during exercise or exertion? What about excessive sweating, extreme fatigue, dizziness, or even collapsing?"</p>
+        <p>"I also need to ask about some specific symptoms that might point to an underlying cause. Have you had any chest pain that feels like a heart attack? Any heat intolerance, unexplained weight loss, or tremor, which might suggest a thyroid issue? Have you experienced panic attacks, or changes in your vision or any new weakness or numbness?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions? It's important to know if you have any pre-existing heart or cardiovascular diseases, such as a previous heart attack, heart failure, high blood pressure, problems with your heart valves, congenital heart conditions, or known arrhythmias. Do you have any cardiovascular risk factors like diabetes, high cholesterol, or obesity? What about thyroid disease, anaemia, or any known electrolyte imbalances? Do you have any current mental health issues like anxiety or depression, or a history of panic disorder?"</p>
+        <p>"Have you ever had any operations or procedures, especially any heart procedures like an ablation (to correct heart rhythm), pacemaker insertion, or heart valve surgery?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? Some medications, like those for heart rhythm (antiarrhythmics), blood pressure (beta-blockers, diuretics), thyroid hormones, or even common inhalers (bronchodilators like salbutamol) or nasal decongestants, can sometimes cause palpitations. Do you consume a lot of caffeine-containing products?"</p>
+        <p>"Have there been any recent changes to your medications – perhaps a new one started, one stopped, or a dose changed?"</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you have?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family – like your parents, siblings, or children – have a history of cardiovascular disease, or particularly any cases of sudden cardiac death, especially at a young age? What about inherited heart conditions like Long QT syndrome, Brugada syndrome, or hypertrophic cardiomyopathy, or other heart rhythm problems?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have a good support network around you? Are you able to manage all your daily activities independently?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much? How much alcohol do you drink in a week? Do you use any recreational drugs, especially stimulants like cocaine, amphetamines, or ecstasy, as these can significantly impact your heart?"</p>
+        <p>"What's your typical diet like, and how about your weight? Do you exercise regularly, and if so, do you notice palpitations occurring during exercise?"</p>
+        <p>"What kind of work do you do? If your job involves working at heights or with heavy machinery, it's very important that you do not return to work until we have fully investigated the cause of your palpitations and deemed it safe."</p>
+        <p>"Regarding driving, it is crucial that you do not drive until you have been fully investigated for your palpitations and cleared by a medical professional. You will also need to check with the DVLA or your local licensing authority regarding their specific requirements for notifying them."</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <p>"Thank you very much for sharing all of that information with me. Just to summarise, you've been experiencing [recap key symptoms], which started [onset] and are often [character/timing]. This has been impacting your [daily life areas]. You've also mentioned [recap relevant PMH/DH/FH/SH]."</p>
+        <p>"Does that sound like an accurate summary? Is there anything else you feel is important that we haven't covered?"</p>
+        <p>"Based on what you've told me, the next steps would be for me to perform a physical examination, focusing on your cardiovascular system, and checking your vital signs. We would also likely arrange for some investigations, such as an ECG (heart tracing), blood tests (like a full blood count, kidney and liver function tests, thyroid function tests, glucose, and cardiac enzymes if needed). Depending on the nature of your palpitations, we might also consider a Holter monitor (a portable ECG recorder for 24-48 hours) or an event recorder (worn for longer periods), an echocardiogram (ultrasound of the heart), or an exercise tolerance test. We may also refer you to a heart specialist (cardiologist) for further assessment."</p>
+        <p>"Do you have any questions for me at this stage?"</p>
+        <p>"Thank you for your time."</p>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

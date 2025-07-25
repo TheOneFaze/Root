@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Ophthalmic History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #e8f5e9; /* Very light, gentle green-blue for background */
+        color: #384e5a; /* Dark muted blue-grey for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #4a8d81; /* A calming, deep teal for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #5c9e91; /* A slightly lighter, yet distinct teal for subheadings */
+      border-left: 5px solid #7fc9b9; /* Matches the darker teal from the header gradient */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #a7d9d0; /* Soft teal-blue for active label (from header gradient) */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #a7d9d0; /* Soft teal-blue when on (from header gradient) */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #384e5a; /* Default text color for labels (from body color) */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #7fc9b9; /* Darker teal for checked background (from header gradient) */
+        border-color: #7fc9b9; /* Darker teal for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-teal based on existing colors */
+    .theme-teal body {
+        background: #e8f5e9;
+        color: #384e5a;
+    }
+    .theme-teal header {
+        color: white;
+        background: linear-gradient(to right, #a7d9d0, #7fc9b9); /* Soft teal-blue gradient */
+    }
+    .theme-teal h1, .theme-teal h2, .theme-teal a {
+        color: #4a8d81; /* Calming, deep teal for section titles */
+    }
+    .theme-teal .section-box {
+        background: white;
+    }
+    .theme-teal h3 {
+        color: #5c9e91; /* Slightly lighter, yet distinct teal for subheadings */
+        border-color: #7fc9b9; /* Matches the darker teal from the header gradient */
+    }
+    .theme-teal .toggle-label.active, .theme-teal .toggle-container .switch.active {
+        background-color: #a7d9d0; /* Soft teal-blue for active toggle */
+    }
+    .theme-teal .section-box label input[type="checkbox"] {
+        border-color: #7fc9b9;
+    }
+    .theme-teal .section-box label input[type="checkbox"]:checked {
+        background-color: #7fc9b9;
+        border-color: #7fc9b9;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Teal */
+    .dark-mode.theme-teal header {
+        color: white;
+        background: linear-gradient(to right, #80cbc4, #4db6ac); /* Lighter teal gradient for dark mode */
+    }
+    .dark-mode.theme-teal h3, .dark-mode.theme-teal a {
+        color: #80cbc4; /* Lighter teal for dark mode headings */
+    }
+    .dark-mode.theme-teal .toggle-label.active, .dark-mode.theme-teal .toggle-container .switch.active {
+        background-color: #80cbc4; /* Lighter teal for dark mode active toggle */
+    }
+    .dark-mode.theme-teal .section-box label input[type="checkbox"] {
+        border-color: #80cbc4; /* Lighter teal for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-teal .section-box label input[type="checkbox"]:checked {
+        background-color: #80cbc4; /* Lighter teal for checked background in dark mode */
+        border-color: #80cbc4;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-teal"> <header>📝 Ophthalmic History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their eye problem?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about their vision, pain, or underlying eye conditions?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation (e.g., diagnosis, relief of symptoms, improved vision)?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👁️ History of Presenting Complaint (Ophthalmic-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Primary Complaint:</strong> <span>Establish the main problem (e.g., visual disturbance, red eye, pain, grittiness/dryness, itching, photophobia, swelling).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Affected Eye(s):</strong> <span>Is it one eye or both? Which one?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset & Duration:</strong> <span>How did the problem start (sudden or gradual)? How long has it lasted? Constant or intermittent?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Ophthalmic Symptoms:</strong> <span>Any other symptoms like visual disturbance (blurring, loss of vision), red eye, discharge (character), dryness, itching, photophobia (light sensitivity), swelling, tenderness around the eye?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Red Flags:</strong> <span>Severe eye pain (especially with reduced vision/red eye), sudden persistent visual disturbance (painless or painful), true photophobia (not just light sensitivity), persistent unilateral red eye, persistent double vision, sudden onset new floaters/flashing lights, black curtain across vision, recent eye trauma, recent eye surgery.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📉 Exploring Visual Disturbance</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset & Progression:</strong> <span>When did it start? Sudden or gradual? Episodic or continuous? Anything make it better or worse?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Type of Vision Affected:</strong> <span>Distance vision, near vision, or both?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Area of Vision Affected:</strong> <span>Does it affect a specific area (e.g., central vision, peripheral vision)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Double Vision (Diplopia):</strong> <span>Is there double vision? If so, is it side-by-side, one image on top of the other, or at an oblique angle? Does it disappear when one eye is covered? (monocular vs binocular diplopia).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>'Positive' Visual Symptoms:</strong> <span>Flashing lights (photopsia), floaters (new onset, increase in number/size), black curtain across field of vision, glare from lights, halos around lights, transient visual loss (amaurosis fugax).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Visual Distortions:</strong> <span>Distorted vision (metamorphopsia), shimmering lights (scintillations).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💥 Exploring Eye Pain (if relevant - use SOCRATES)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Site:</strong> <span>Where is the pain located (e.g., in the eye, around the eye, behind the eye)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset:</strong> <span>When did it start? Sudden or gradual?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Character:</strong> <span>Describe the pain (e.g., sharp, dull, aching, throbbing, gritty, burning).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Radiation:</strong> <span>Does the pain spread anywhere (e.g., temple, jaw, forehead)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms:</strong> <span>Nausea, vomiting, headache, photophobia, red eye, reduced vision.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Timing & Progression:</strong> <span>Constant or intermittent? Getting worse, better, or same?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Exacerbating/Relieving Factors:</strong> <span>What makes it better or worse (e.g., eye movement, light, touch, painkillers)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Severity:</strong> <span>On a scale of 1-10.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>🩹 Exploring Eye Trauma (if relevant)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Eye Protection:</strong> <span>Was eye protection worn at the time of injury?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Mechanism of Injury:</strong> <span>What caused the injury (e.g., chemical splash, blunt object, sharp object, foreign body)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Foreign Object Details:</strong> <span>If a flying object was responsible, characterise its size, speed, and nature (e.g., metal fragment, wood splinter, dust).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Symptoms after Trauma:</strong> <span>Pain, visual changes, redness, tearing, discharge, photophobia immediately after injury.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Screen for relevant symptoms in other body systems (e.g., joint pain, rash, dry mouth/eyes, neurological symptoms, headaches, sinus pain, fever).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👁️‍🗨️ Past Ocular History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Any previous similar episodes (e.g., recurrent conjunctivitis, styes, uveitis)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous eye problems/diagnoses (e.g., glaucoma, cataracts, macular degeneration, amblyopia, diabetic retinopathy, optic neuritis).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>History of previous eye trauma.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>History of ocular surgery (e.g., cataract surgery, refractive surgery, glaucoma surgery).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Use of prescription glasses (for distance or near vision). When was last eye test?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Use of contact lenses: type (e.g., daily, monthly), lens hygiene practices, wearing lenses while sleeping, showering, or swimming.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions that can be associated with ophthalmic disease: diabetes, hypertension, autoimmune diseases (e.g., rheumatoid arthritis, lupus, inflammatory bowel disease), thyroid disease, neurological conditions (e.g., MS), cardiovascular disease, malignancy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (not necessarily ocular).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially eye drops (type, frequency, duration), steroids, amiodarone, tamoxifen, sildenafil, ethambutol.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions (especially to eye drops or medications).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Similar complaints or formal diagnoses of eye disease (e.g., glaucoma, macular degeneration, retinoblastoma), or conditions strongly associated with eye disease (e.g., hypertension, diabetes, rheumatological disease) in first-degree relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation, social support, ability to manage ADLs, smoking (can worsen certain eye conditions), alcohol intake, recreational drug use.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Occupation:</strong> <span>Any occupational hazards for eye injury (e.g., welding, chemical exposure, carpentry).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Driving:</strong> <span>Driving status. If significant visual impairment or other concerning symptoms (e.g., transient ischaemic attack symptoms), advise the patient not to drive until fully investigated and cleared by medical professional/DVLA.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., ocular examination - visual acuity, fields, fundoscopy, slit lamp, intraocular pressure; systemic examination if indicated; blood tests; imaging; referral to ophthalmology).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today to discuss a problem with your eye(s). Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing this eye problem, or what it might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👁️ Exploring the Eye Problem (Ophthalmic-Specific)</h3>
+        <p>"Could you please tell me more about the main problem you're experiencing with your eye(s)? Is it a visual disturbance, redness, pain, grittiness, dryness, itching, sensitivity to light, or swelling?"</p>
+        <p>"Is it affecting one eye or both? Which one?"</p>
+        <p>"How did this problem start? Was it sudden or gradual? And how long has it been going on? Is it constant, or does it come and go?"</p>
+        <p>"Have you noticed any other eye-related symptoms along with it? Such as blurring of vision, any loss of vision, a red eye, discharge (what does it look like?), dryness, itching, sensitivity to light (photophobia), or any swelling or tenderness around the eye?"</p>
+        <p>"I also need to ask about some important 'red flag' symptoms. Are you experiencing severe eye pain, especially if it's accompanied by reduced vision or a very red eye? Has there been a sudden and persistent change in your vision, whether it's painful or not? Do you have true photophobia, meaning light causes severe pain, not just a general sensitivity? Is one eye persistently red without obvious cause? Are you seeing double vision that doesn't go away when you cover one eye? Have you had a sudden onset of new floaters or flashing lights, or noticed a black curtain coming across your vision? Have you had any recent trauma to your eye, or any recent eye surgery?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📉 Exploring Visual Disturbance (if relevant)</h3>
+        <p>"Could you tell me more about your visual disturbance? When did it start, and did it come on suddenly or gradually? Is it something that happens sometimes (episodic) or is it continuous? Does anything make it better or worse?"</p>
+        <p>"Does it affect your distance vision, your near vision, or both?"</p>
+        <p>"Does the visual disturbance only affect a specific part of your vision, like the very centre, or the edges (peripheral vision)?"</p>
+        <p>"Are you experiencing any double vision? If so, do you see images side-by-side, one on top of the other, or at an oblique angle? Does the double vision disappear if you cover one eye?"</p>
+        <p>"Have you had any other visual phenomena, like flashing lights (photopsia), or new floaters (small specks or lines floating in your vision)? Have you noticed a black curtain coming across your field of vision, or glare from lights, or halos around lights? What about any transient loss of vision in one eye?"</p>
+        <p>"Do you see any visual distortions, where straight lines appear wavy (metamorphopsia), or do you see shimmering lights (scintillations)?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💥 Exploring Eye Pain (if relevant - use SOCRATES)</h3>
+        <p>"Could you describe the eye pain for me? Where exactly is the pain located – is it in the eye itself, around the eye, or behind the eye?"</p>
+        <p>"When did the pain start, and was it sudden or gradual?"</p>
+        <p>"How would you describe the character of the pain? Is it sharp, dull, aching, throbbing, a gritty feeling, or burning?"</p>
+        <p>"Does the pain spread anywhere else, such as to your temple, jaw, or forehead?"</p>
+        <p>"Are there any other symptoms associated with the eye pain, like nausea, vomiting, a headache, light sensitivity (photophobia), redness of the eye, or reduced vision?"</p>
+        <p>"Is the pain constant, or does it come and go? Has it been getting worse, better, or staying the same?"</p>
+        <p>"What makes the pain better or worse? Does moving your eye aggravate it? Does light make it worse? What about touching your eye, or taking painkillers?"</p>
+        <p>"On a scale of 1 to 10, how severe is your eye pain?"</p>
+    </div>
+    <div class="section-box">
+        <h3>🩹 Exploring Eye Trauma (if relevant)</h3>
+        <p>"Regarding your eye injury, were you wearing any eye protection at the time?"</p>
+        <p>"What caused the injury? Was it a chemical splash, a blunt object, a sharp object, or did something fly into your eye?"</p>
+        <p>"If something flew into your eye, can you tell me about the object? What size was it, how fast was it moving, and what was it made of (e.g., a metal fragment, a piece of wood, dust)?"</p>
+        <p>"What symptoms did you experience immediately after the trauma? Did you have pain, changes in vision, redness, excessive tearing, discharge, or sensitivity to light?"</p>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <p>"Are you experiencing any other symptoms anywhere else in your body? For example, joint pain, a skin rash, dry mouth or eyes, any new weakness or numbness, headaches, or sinus pain? Do you have any fever?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👁️‍🗨️ Past Ocular History</h3>
+        <p>"Have you had any previous episodes similar to this one before, such as recurrent conjunctivitis, styes, or inflammation inside the eye (uveitis)?"</p>
+        <p>"Do you have any known previous eye problems or diagnoses, such as glaucoma, cataracts, macular degeneration, a 'lazy eye' (amblyopia), diabetic retinopathy, or inflammation of the optic nerve (optic neuritis)?"</p>
+        <p>"Have you ever had any eye trauma in the past?"</p>
+        <p>"Have you undergone any eye surgery?"</p>
+        <p>"Do you use prescription glasses? Are they for distance vision, near vision, or both? When was your last eye test?"</p>
+        <p>"Do you wear contact lenses? What type are they (e.g., daily disposables, monthly lenses)? How do you clean and store them, and do you ever wear them while sleeping, showering, or swimming?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions? I'm particularly interested in conditions that can be associated with eye problems, such as diabetes, high blood pressure, autoimmune diseases like rheumatoid arthritis, lupus, or inflammatory bowel disease, thyroid disease, neurological conditions like multiple sclerosis, cardiovascular disease, or any history of cancer."</p>
+        <p>"Have you ever had any other operations or procedures, not necessarily on your eyes?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? This includes any eye drops you might be using – what type, how often, and for how long have you been using them? Some medications, like steroids, amiodarone, tamoxifen, sildenafil, or ethambutol, can sometimes affect the eyes."</p>
+        <p>"Do you have any allergies to medications or anything else, especially to eye drops? If so, what kind of reaction did you have?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family have a history of similar eye complaints, or a formal diagnosis of eye disease like glaucoma, macular degeneration, or retinoblastoma? What about conditions that are strongly associated with eye disease, such as high blood pressure, diabetes, or rheumatological diseases?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have a good support network around you? Are you able to manage all your daily activities independently?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much? How much alcohol do you drink in a week? Do you use any recreational drugs?"</p>
+        <p>"What kind of work do you do, and are there any occupational hazards for eye injury in your workplace, such as welding, chemical exposure, or carpentry?"</p>
+        <p>"Regarding driving, if you have significant visual impairment or any other concerning symptoms that might affect your driving (like symptoms of a mini-stroke), I would strongly advise you not to drive until you have been fully investigated and cleared by a medical professional or the DVLA."</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., comprehensive ocular examination - visual acuity, visual fields, fundoscopy, slit lamp examination, intraocular pressure measurement; systemic examination if indicated; blood tests; imaging; referral to ophthalmology).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

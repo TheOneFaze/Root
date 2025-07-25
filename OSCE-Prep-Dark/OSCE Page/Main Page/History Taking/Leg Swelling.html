@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Leg Swelling History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f0f0; /* Very light, warm off-white with a hint of red */
+        color: #5c4b4b; /* Deep muted red-brown for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #a3473b; /* Muted reddish-brown for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #b56056; /* A slightly lighter, comforting red-brown for subheadings */
+      border-left: 5px solid #c05844; /* Matches the deeper red from the header gradient */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #e07a5f; /* Soft terracotta for active label (from header gradient) */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #e07a5f; /* Soft terracotta when on (from header gradient) */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #5c4b4b; /* Default text color for labels (from body color) */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #c05844; /* Deeper brick red for checked background (from header gradient) */
+        border-color: #c05844; /* Deeper brick red for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-terracotta based on existing colors */
+    .theme-terracotta header {
+        color: white;
+        background: linear-gradient(to right, #e07a5f, #c05844); /* Soft terracotta to deeper brick red gradient */
+    }
+    .theme-terracotta h1, .theme-terracotta h2, .theme-terracotta a {
+        color: #a3473b; /* Muted reddish-brown for titles */
+    }
+    .theme-terracotta .section-box {
+        background: white;
+    }
+    .theme-terracotta h3 {
+        color: #b56056; /* A slightly lighter, comforting red-brown for subheadings */
+        border-color: #c05844; /* Matches the deeper red from the header gradient */
+    }
+    .theme-terracotta .toggle-label.active, .theme-terracotta .toggle-container .switch.active {
+        background-color: #e07a5f; /* Soft terracotta for active toggle */
+    }
+    .theme-terracotta .section-box label input[type="checkbox"] {
+        border-color: #c05844;
+    }
+    .theme-terracotta .section-box label input[type="checkbox"]:checked {
+        background-color: #c05844;
+        border-color: #c05844;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Terracotta */
+    .dark-mode.theme-terracotta header {
+        color: white;
+        background: linear-gradient(to right, #ffccbc, #ffab91); /* Lighter terracotta gradient for dark mode */
+    }
+    .dark-mode.theme-terracotta h3, .dark-mode.theme-terracotta a {
+        color: #ffccbc; /* Lighter terracotta for dark mode headings */
+    }
+    .dark-mode.theme-terracotta .toggle-label.active, .dark-mode.theme-terracotta .toggle-container .switch.active {
+        background-color: #ffccbc; /* Lighter terracotta for dark mode active toggle */
+    }
+    .dark-mode.theme-terracotta .section-box label input[type="checkbox"] {
+        border-color: #ffccbc; /* Lighter terracotta for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-terracotta .section-box label input[type="checkbox"]:checked {
+        background-color: #ffccbc; /* Lighter terracotta for checked background in dark mode */
+        border-color: #ffccbc;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-terracotta"> <header>📝 Leg Swelling History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their leg swelling?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about the swelling (e.g., serious underlying condition, DVT)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation (e.g., diagnosis, relief of symptoms)?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>🦵 History of Presenting Complaint (Leg Swelling-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Unilateral/Bilateral:</strong> <span>Is the swelling in one leg or both? If unilateral, which leg?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset & Duration:</strong> <span>When did the swelling start? Was it sudden or gradual? How long has it been present?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Characteristics:</strong> <span>Is the swelling pitting (leaves an indentation when pressed) or non-pitting? Is the skin discolored (e.g., red, bluish, brownish)? Is it warm or cool to touch?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Progression:</strong> <span>How has the swelling changed over time? Is it getting worse, better, or staying the same?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms:</strong> <span>Pain, erythema (redness), itching, fever, rash, skin changes (e.g., ulcers, thickening), shortness of breath, chest pain, palpitations, cough, weight gain, abdominal swelling, vaginal bleeding, discharge.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Pain:</strong> <span>Describe any pain in the affected leg(s) – character, severity, radiation, aggravating/relieving factors.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Diurnal Variation:</strong> <span>Is it worse at certain times of day (e.g., end of the day, after prolonged standing)? Does it improve with elevation or rest?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Impact:</strong> <span>How does the swelling affect daily life, mobility, ability to wear shoes/clothing, hygiene?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Red Flags:</strong> <span>Sudden onset unilateral leg swelling with pain/warmth/redness (DVT), associated chest pain or shortness of breath (PE), fever and severe local pain (cellulitis), bilateral rapidly progressive swelling with breathing difficulties (heart failure).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions: heart failure, kidney disease, liver disease (cirrhosis), deep vein thrombosis (DVT), pulmonary embolism (PE), varicose veins, chronic venous insufficiency, lymphatic obstruction (lymphoedema), thyroid disease, pelvic masses, allergies.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (especially abdominal/pelvic surgery, orthopaedic surgery, lymph node dissection).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially calcium channel blockers (e.g., amlodipine), NSAIDs, corticosteroids, oral contraceptives, HRT, thiazolidinediones (for diabetes).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Any recent changes in medication?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Clotting disorders (e.g., DVT/PE), heart failure, kidney disease, liver disease, lymphatic conditions.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation, social support, ability to manage ADLs, recent prolonged immobility (e.g., long flights, bed rest), recent trauma.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking, alcohol intake, recreational drug use, diet (high salt intake), fluid intake, exercise.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Occupation:</strong> <span>Inquire about prolonged standing or sitting.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., physical examination, cardiovascular/respiratory exam, leg exam, vital signs, urine dipstick, blood tests - U&Es, LFTs, TFTs, D-dimer, imaging - Doppler ultrasound, CXR, ECG).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today because you've been experiencing swelling in your legs. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing this leg swelling, or what it might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>🦵 Exploring the Leg Swelling (Leg Swelling-Specific)</h3>
+        <p>"Could you please tell me more about the leg swelling? Is it in one leg or both? If it's just one, which leg is it?"</p>
+        <p>"When did the swelling first start, and did it come on suddenly or gradually? How long has it been present?"</p>
+        <p>"How would you describe the swelling? If you press on it, does it leave a dent or 'pit' (pitting oedema)? Has the skin changed color – is it red, bluish, or brownish? Does it feel warm or cool to touch?"</p>
+        <p>"How has the swelling changed over time? Is it getting worse, staying the same, or does it fluctuate?"</p>
+        <p>"Have you noticed any other symptoms happening with the swelling? Like pain, redness, or itching in the leg? What about a fever or rash? Are you feeling short of breath, or having any chest pain or palpitations? Any cough? Have you gained weight recently, or noticed swelling in your abdomen? For women, have you had any unusual vaginal bleeding or discharge?"</p>
+        <p>"Can you describe any pain in the affected leg(s)? Where is it, how severe is it, what does it feel like (e.g., aching, sharp), and does it spread anywhere? What makes it better or worse?"</p>
+        <p>"Does the swelling change throughout the day? For example, is it worse by the end of the day or after standing for a long time? Does it improve if you rest or elevate your legs?"</p>
+        <p>"How does this leg swelling impact your daily life? Does it affect your mobility, or your ability to wear certain shoes or clothing? Does it make hygiene more difficult?"</p>
+        <p>"I also need to ask about some important 'red flag' symptoms. Did the swelling in one leg come on very suddenly and is it associated with pain, warmth, or redness, which could suggest a blood clot (DVT)? Are you experiencing any chest pain or severe shortness of breath along with the swelling, which could indicate a clot in your lungs (PE)? Do you have a fever and severe pain in the leg, suggesting an infection like cellulitis? Or if the swelling is in both legs and worsening rapidly with significant breathing difficulties, this could be a sign of heart failure."</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions, such as heart failure, kidney disease, liver disease like cirrhosis, a history of deep vein thrombosis (DVT) or pulmonary embolism (PE)? What about varicose veins or chronic venous insufficiency, problems with your lymphatic system (lymphoedema), or thyroid disease? Have you ever had any growths or masses in your pelvis?"</p>
+        <p>"Have you ever had any operations or procedures, especially any abdominal or pelvic surgery, orthopaedic surgery, or surgery where lymph nodes were removed?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? Some medications, like certain blood pressure tablets (e.g., amlodipine), anti-inflammatory drugs (NSAIDs), steroids, oral contraceptives, or hormone replacement therapy, can sometimes cause leg swelling."</p>
+        <p>"Have there been any recent changes to your medications?"</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you have?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family have a history of clotting disorders like DVT or PE, heart problems, kidney disease, liver disease, or lymphatic conditions?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have a good support network around you? Are you able to manage all your daily activities independently?"</p>
+        <p>"Have you had any recent prolonged periods of immobility, such as long flights or bed rest after an illness or injury? Have you experienced any recent trauma to your legs?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much? How much alcohol do you drink in a week? Do you use any recreational drugs?"</p>
+        <p>"What's your typical diet like, especially your salt intake? How about your fluid intake and exercise habits?"</p>
+        <p>"What kind of work do you do? Does your job involve prolonged standing or sitting?"</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <p>"Thank you very much for sharing all of that information with me. Just to summarise, you've been experiencing [recap key symptoms], which started [onset] and are often [character/timing]. This has been impacting your [daily life areas]. You've also mentioned [recap relevant PMH/DH/FH/SH]."</p>
+        <p>"Does that sound like an accurate summary? Is there anything else you feel is important that we haven't covered?"</p>
+        <p>"Based on what you've told me, the next steps would be for me to perform a physical examination, focusing on your cardiovascular and respiratory systems, and a thorough examination of your legs. We'll also check your vital signs and may arrange for some investigations, such as a urine dipstick, blood tests (like U&Es, LFTs, thyroid function tests, or a D-dimer if we suspect a clot), and possibly imaging like a Doppler ultrasound of your legs, a chest X-ray, or an ECG."</p>
+        <p>"Do you have any questions for me at this stage?"</p>
+        <p>"Thank you for your time."</p>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

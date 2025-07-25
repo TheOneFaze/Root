@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Male LUTS History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #e3f2fd; /* Very light blue for background */
+        color: #3f51b5; /* Medium dark blue for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #1976d2; /* A strong, clear blue for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #42a5f5; /* A slightly lighter, yet distinct blue for subheadings */
+      border-left: 5px solid #2196f3; /* Matches the darker blue from the header gradient */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #64b5f6; /* Light blue for active label */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before { /* This rule was missing */
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #64b5f6; /* Light blue when on */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #3f51b5; /* Default text color for labels */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #2196f3; /* Medium blue for checked background */
+        border-color: #2196f3; /* Medium blue for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-blue based on existing colors */
+    .theme-blue body {
+        background: #e3f2fd; /* Very light blue for background */
+        color: #3f51b5; /* Medium dark blue for text */
+    }
+    .theme-blue header {
+        color: white;
+        background: linear-gradient(to right, #64b5f6, #2196f3); /* Light to medium blue gradient */
+    }
+    .theme-blue h1, .theme-blue h2, .theme-blue a {
+        color: #1976d2; /* A strong, clear blue for section titles */
+    }
+    .theme-blue .section-box {
+        background: white;
+    }
+    .theme-blue h3 {
+        color: #42a5f5; /* A slightly lighter, yet distinct blue for subheadings */
+        border-color: #2196f3; /* Matches the darker blue from the header gradient */
+    }
+    .theme-blue .toggle-label.active, .theme-blue .toggle-container .switch.active {
+        background-color: #64b5f6; /* Light blue for active toggle */
+    }
+    .theme-blue .section-box label input[type="checkbox"] {
+        border-color: #2196f3;
+    }
+    .theme-blue .section-box label input[type="checkbox"]:checked {
+        background-color: #2196f3;
+        border-color: #2196f3;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Blue */
+    .dark-mode.theme-blue header {
+        color: white;
+        background: linear-gradient(to right, #90caf9, #64b5f6); /* Lighter blue gradient for dark mode */
+    }
+    .dark-mode.theme-blue h3, .dark-mode.theme-blue a {
+        color: #90caf9; /* Lighter blue for dark mode headings */
+    }
+    .dark-mode.theme-blue .toggle-label.active, .dark-mode.theme-blue .toggle-container .switch.active {
+        background-color: #90caf9; /* Lighter blue for dark mode active toggle */
+    }
+    .dark-mode.theme-blue .section-box label input[type="checkbox"] {
+        border-color: #90caf9; /* Lighter blue for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-blue .section-box label input[type="checkbox"]:checked {
+        background-color: #90caf9; /* Lighter blue for checked background in dark mode */
+        border-color: #90caf9;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-blue"> <header>📝 Male LUTS History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their urinary symptoms?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about the symptoms (e.g., prostate cancer, incontinence)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>🚽 History of Presenting Complaint (LUTS-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset & Duration:</strong> <span>When did symptoms start? Sudden or gradual? How long have they lasted?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Storage Symptoms:</strong> <span>Frequency (day/night), urgency (sudden need to void), incontinence (stress, urge, mixed, overflow, continuous), nocturia (waking at night to void), bladder pain.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Voiding Symptoms:</strong> <span>Hesitancy (difficulty starting), straining, weak stream, intermittency (stop-start flow), terminal dribbling, incomplete emptying.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Post-Micturition Dribble:</strong> <span>Involuntary leakage of urine immediately after finishing urination.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Retention:</strong> <span>Difficulty or inability to pass urine, acute or chronic (e.g., constant dribbling with full bladder).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Pain:</strong> <span>Dysuria (pain on urination), suprapubic pain (bladder area), perineal pain, testicular pain, flank/groin/lower back pain.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Other Associated Symptoms:</strong> <span>Haematuria (blood in urine), fever, chills, sweating, weight loss, bloating, erectile dysfunction, excessive thirst, neurological symptoms (e.g., weakness, numbness), constipation, vomiting.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Timing & Triggers:</strong> <span>Constant vs. episodic? Any triggers (e.g., cold weather, certain foods/drinks, medications)? Any diurnal variation?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Impact:</strong> <span>How do symptoms affect daily life, sleep, social activities, work, hygiene? How is incontinence managed (pads, clothing changes)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Red Flags:</strong> <span>Painless macroscopic haematuria (especially >45 years old), recurrent UTIs, unexplained weight loss, new onset back pain (especially with urinary symptoms - prostate cancer), new neurological symptoms.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions: benign prostatic hyperplasia (BPH), prostate cancer, recurrent UTIs, kidney stones, diabetes, neurological conditions (e.g., Parkinson's, MS, spinal cord injury), previous urethral strictures, sexually transmitted infections.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (e.g., prostate surgery, hernia repair, rectal surgery, catheterisation history).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially diuretics, anticholinergics, alpha-agonists (decongestants), antidepressants, sedatives, or new medications.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Recreational drug use (e.g., ketamine).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Prostate cancer, other urological cancers, urological problems (e.g., BPH, kidney stones), neurological conditions in first-degree relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation, social support, ability to manage ADLs.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking, alcohol intake, diet (fluid intake, caffeine, fizzy drinks, artificial sweeteners), exercise.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Occupation:</strong> <span>Identify any risk factors for bladder cancer (e.g., exposure to dyes, rubber, chemicals).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., urine dipstick/MSU, physical examination - DRE, blood tests - U&Es, PSA, imaging, uroflowmetry, bladder diary, referral to urology).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today to discuss some urinary symptoms you've been experiencing. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing these symptoms, or what they might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>🚽 Exploring the Urinary Symptoms (LUTS-Specific)</h3>
+        <p>"Could you please tell me more about your urinary symptoms? When did they first start, and did they come on suddenly or gradually? How long have they been going on?"</p>
+        <p>"Let's talk about the specific problems you're having. Are you needing to pass urine much more often than usual, both during the day and at night? How many times a day, and how many times do you wake up at night to go?"</p>
+        <p>"Do you ever get a sudden, strong urge to go to the toilet that's hard to defer?"</p>
+        <p>"Have you experienced any leakage of urine? If so, does it happen when you cough, sneeze, laugh, or exercise (stress incontinence)? Or does it happen when you get a sudden urge to go but can't make it to the toilet in time (urge incontinence)? Is it a continuous leak? How do you manage this – do you use pads, or change your clothing frequently?"</p>
+        <p>"When you go to the toilet, do you have any difficulty starting to pass urine (hesitancy)? Is your stream weak or stop-start? Do you feel like your bladder isn't completely empty after you've finished?"</p>
+        <p>"Do you experience any 'post-micturition dribble' – meaning you leak urine shortly after you think you've finished urinating?"</p>
+        <p>"Have you ever had difficulty passing urine at all, leading to your bladder feeling very full (urinary retention)? This can sometimes cause constant dribbling."</p>
+        <p>"Do you ever feel pain when you pass urine (dysuria)? What about pain in your lower tummy (suprapubic), perineum, testicles, flanks, groin, or lower back?"</p>
+        <p>"Have you noticed any blood in your urine (haematuria)? Is it visible, or has it been picked up on a test? Have you had any other symptoms like fever, chills, night sweats, weight loss, bloating, or erectile dysfunction? What about excessive thirst, any new weakness or numbness, constipation, or vomiting?"</p>
+        <p>"How have your urinary symptoms changed over time? Are they constant, or do they come and go? Are there any specific triggers for your symptoms, or anything that makes them better or worse, like cold weather or certain drinks?"</p>
+        <p>"How have these symptoms impacted your daily life, your sleep, your social activities, or your work?"</p>
+        <p>"I also need to ask about some important 'red flag' symptoms. Have you noticed any painless blood in your urine, especially if you're over 45? Have you had recurrent urine infections? Any unexplained weight loss, or new onset back pain that wasn't there before, especially with your urinary symptoms? What about any new weakness or numbness in your legs?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions, such as benign prostatic hyperplasia (BPH) or prostate cancer? What about recurrent urine infections, kidney stones, diabetes, or neurological conditions like Parkinson's disease, multiple sclerosis, or a spinal cord injury? Have you ever had any urethral strictures, or sexually transmitted infections?"</p>
+        <p>"Have you ever had any operations or procedures, especially any prostate surgery, hernia repair, or rectal surgery? Have you ever needed a catheter?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? Some medications, like water tablets (diuretics), or certain cold remedies that contain alpha-agonists, or even some antidepressants and sedatives, can sometimes affect bladder function. Have you ever used recreational drugs, particularly ketamine?"</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you had?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family – like your father or brother – have a history of prostate cancer, or other urological cancers? What about other urological problems like BPH or kidney stones, or neurological conditions?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have a good support network around you? Are you able to manage all your daily activities independently?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much? How much alcohol do you drink in a week?"</p>
+        <p>"What's your typical diet like, especially your fluid intake and consumption of caffeine, fizzy drinks, or artificial sweeteners?"</p>
+        <p>"What kind of work do you do, and have you been exposed to any chemicals, dyes, or rubber in your occupation, as these can sometimes be risk factors for bladder cancer?"</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <p>"Thank you very much for sharing all of that information with me. Just to summarise, you've been experiencing [recap key symptoms], which started [onset] and are often [character/timing]. This has been impacting your [daily life areas]. You've also mentioned [recap relevant PMH/DH/FH/SH]."</p>
+        <p>"Does that sound like an accurate summary? Is there anything else you feel is important that we haven't covered?"</p>
+        <p>"Based on what you've told me, the next steps would be for me to perform a physical examination, including an abdominal and a digital rectal examination (DRE) to assess your prostate. We would also likely arrange for some investigations, such as a urine dipstick and culture, blood tests (like U&Es and PSA if appropriate), imaging (like an ultrasound), a uroflowmetry test to measure urine flow, and possibly a bladder diary. We may also refer you to a urologist for further assessment."</p>
+        <p>"Do you have any questions for me at this stage?"</p>
+        <p>"Thank you for your time."</p>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

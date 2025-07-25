@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Stroke/TIA History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f0f0; /* Light grey for background */
+        color: #333333; /* Dark grey for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #4a4a4a; /* Medium dark grey for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #616161; /* A slightly lighter grey for subheadings */
+      border-left: 5px solid #8d021f; /* A strong, deep red for emphasis, related to blood/brain */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #7a7a7a; /* Dark grey for active label */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #7a7a7a; /* Dark grey when on */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #333333; /* Default text color for labels */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #8d021f; /* Strong red for checked background */
+        border-color: #8d021f; /* Strong red for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-grey-red based on existing colors */
+    .theme-grey-red body {
+        background: #f0f0f0;
+        color: #333333;
+    }
+    .theme-grey-red header {
+        color: white;
+        background: linear-gradient(to right, #7a7a7a, #5c5c5c); /* Dark grey gradient */
+    }
+    .theme-grey-red h1, .theme-grey-red h2, .theme-grey-red a {
+        color: #4a4a4a; /* Medium dark grey for titles */
+    }
+    .theme-grey-red .section-box {
+        background: white;
+    }
+    .theme-grey-red h3 {
+        color: #616161; /* Slightly lighter grey for subheadings */
+        border-color: #8d021f; /* Strong, deep red for emphasis */
+    }
+    .theme-grey-red .toggle-label.active, .theme-grey-red .toggle-container .switch.active {
+        background-color: #7a7a7a; /* Dark grey for active toggle */
+    }
+    .theme-grey-red .section-box label input[type="checkbox"] {
+        border-color: #8d021f;
+    }
+    .theme-grey-red .section-box label input[type="checkbox"]:checked {
+        background-color: #8d021f;
+        border-color: #8d021f;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Grey-Red */
+    .dark-mode.theme-grey-red header {
+        color: white;
+        background: linear-gradient(to right, #9e9e9e, #7a7a7a); /* Lighter grey gradient for dark mode */
+    }
+    .dark-mode.theme-grey-red h3, .dark-mode.theme-grey-red a {
+        color: #e0e0e0; /* Lighter grey for dark mode headings */
+    }
+    .dark-mode.theme-grey-red .toggle-label.active, .dark-mode.theme-grey-red .toggle-container .switch.active {
+        background-color: #9e9e9e; /* Lighter grey for dark mode active toggle */
+    }
+    .dark-mode.theme-grey-red .section-box label input[type="checkbox"] {
+        border-color: #a3314a; /* Slightly desaturated red for dark mode border */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-grey-red .section-box label input[type="checkbox"]:checked {
+        background-color: #a3314a; /* Slightly desaturated red for dark mode checked background */
+        border-color: #a3314a;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-grey-red"> <header>📝 Stroke/TIA History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think caused their symptoms (stroke/TIA)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about current symptoms, future events, or long-term disability?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation (e.g., diagnosis, treatment, prevention)?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>🚨 History of Presenting Complaint (Stroke/TIA-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Collateral History:</strong> <span>Crucial to establish if there is a witness who can provide collateral history, especially for onset time and exact symptoms.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset Time (Last Known Well):</strong> <span>Precisely establish the exact time the patient was last known to be well/normal. If the patient woke up with symptoms, ask if they got up in the night for any reason and if they noticed any symptoms then (helps narrow the window for thrombolysis/thrombectomy eligibility).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Symptoms:</strong> <span>Establish the specific neurological symptoms the patient is experiencing or experienced:</span>
+                <ul>
+                    <li><input type="checkbox"> <strong>Weakness:</strong> <span>Sudden weakness or paralysis on one side of the body (face, arm, leg).</span></li>
+                    <li><input type="checkbox"> <strong>Sensory Disturbance:</strong> <span>Sudden numbness, tingling, or loss of sensation on one side of the body.</span></li>
+                    <li><input type="checkbox"> <strong>Visual Disturbance:</strong> <span>Sudden loss of vision in one eye (amaurosis fugax), double vision, or visual field defect.</span></li>
+                    <li><input type="checkbox"> <strong>Speech Disturbance (Dysphasia/Aphasia):</strong> <span>Difficulty speaking (slurring words, finding words, understanding speech), or complete inability to speak.</span></li>
+                    <li><input type="checkbox"> <strong>Swallowing Difficulty (Dysphagia):</strong> <span>Sudden difficulty swallowing.</span></li>
+                    <li><input type="checkbox"> <strong>Balance/Coordination Issues (Ataxia/Vertigo):</strong> <span>Sudden loss of balance, dizziness, vertigo, or difficulty walking.</span></li>
+                </ul>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Severity:</strong> <span>Explore the severity of the symptoms and their immediate impact (e.g., ability to move, speak, walk).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Evolution:</strong> <span>Explore how the patient’s symptoms have evolved since their onset: improving, worsening, fluctuating, or resolved? (Crucial for TIA vs Stroke).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Precipitating Factors:</strong> <span>Ask about potential precipitating factors (e.g., recent neck trauma/manipulation - for dissection, recent head injury, significant physical exertion).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms:</strong> <span>Ask about associated symptoms: headache (especially severe, sudden onset), fever, nausea, vomiting, seizures, palpitations, chest pain.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Previous Episodes:</strong> <span>Ask about any previous episodes with similar symptoms (previous TIA/stroke). How were they diagnosed and managed?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Dominant Hand:</strong> <span>Ask the patient what their dominant hand is (helps to assess functional impact of weakness/sensory loss).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Pain:</strong> <span>Ask the patient if they have any pain, and if so, characterise it (SOCRATES).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Screen for relevant symptoms in other body systems, particularly cardiovascular (e.g., angina, dyspnoea, palpitations, leg swelling), neurological (e.g., dizzy spells, balance issues, seizures), and general symptoms (e.g., weight loss, fever).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions: It is important to ask specifically about stroke/TIA risk factors and existing cardiovascular disease: hypertension, diabetes, hyperlipidaemia (high cholesterol), atrial fibrillation (AF), previous stroke/TIA, coronary artery disease (CAD), peripheral arterial disease (PAD), previous heart attack (MI), carotid artery disease, heart valve disease, known clotting disorders, migraines with aura.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (especially cardiac, vascular, or neurological procedures).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – specifically anticoagulants (e.g., warfarin, DOACs), antiplatelets (e.g., aspirin, clopidogrel), antihypertensives, statins, oral contraceptives, HRT. Compliance with existing medications.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Any family history of stroke, TIA, heart disease (e.g., early MI, AF), diabetes, hypertension, or inherited clotting disorders in first-degree relatives. Clarify at what age the diseases developed in the relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation (type of accommodation, stairs), who the patient lives with, social support, ability to manage ADLs (current and baseline), and any impact of symptoms on independence.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking history (pack-years), alcohol intake, recreational drug use (especially cocaine, amphetamines, IV drug use). Diet (high salt/fat), weight (BMI), regular exercise.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Occupation/Driving:</strong> <span>Current occupation (and if able to return to work). If the patient works at heights or with heavy machinery, advise them they should not return to work until fully investigated. Driving status: it is important to advise the patient not to drive until they have been fully investigated for their TIA/stroke; they will also have to inform the relevant driving authority (e.g., DVLA in the UK) about the event.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., neurological examination, cardiovascular examination, vital signs, blood tests - FBC, U&Es, LFTs, glucose, lipids, clotting screen, ECG, imaging - CT head, MRI brain, CT angiogram, carotid Doppler, referral to stroke team/TIA clinic).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today because you've been experiencing some sudden symptoms that might be related to a stroke or TIA. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might have caused these symptoms, or what it might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>🚨 Exploring the Event (Stroke/TIA-Specific)</h3>
+        <p>"Could you please tell me more about what happened? When exactly were you last known to be well or completely normal? This is a very important time for us to establish. If you woke up with the symptoms, did you get up at all in the night, perhaps to use the bathroom, and did you notice anything unusual then?"</p>
+        <p>"Was anyone with you when the symptoms started? If so, it would be very helpful if we could speak with them later, as their account might provide crucial details about the exact onset and what they observed."</p>
+        <p>"Could you describe the symptoms you experienced in as much detail as possible? Did you suddenly develop weakness or paralysis on one side of your face, arm, or leg?"</p>
+        <p>"Did you experience any sudden numbness, tingling, or a loss of sensation on one side of your body?"</p>
+        <p>"What about your vision? Did you have any sudden loss of vision in one eye, or double vision, or problems with seeing things in a certain part of your visual field?"</p>
+        <p>"Did you have any difficulty speaking, such as slurring your words, having trouble finding the right words, or difficulty understanding what others were saying to you? What about difficulty swallowing?"</p>
+        <p>"Did you experience any sudden loss of balance, dizziness, or feel like the room was spinning (vertigo)? Did you have any trouble walking or coordinating your movements?"</p>
+        <p>"How severe were your symptoms, and how did they affect you immediately? Were you able to move or speak normally?"</p>
+        <p>"How have your symptoms changed since they first started? Are they improving, getting worse, fluctuating, or have they completely resolved?"</p>
+        <p>"Have you had any recent head injuries or neck trauma, or perhaps any neck manipulation, that might have preceded these symptoms?"</p>
+        <p>"Did you have any other associated symptoms, like a headache (especially if it was very sudden and severe), fever, nausea, vomiting, seizures, or your heart racing (palpitations)?"</p>
+        <p>"Have you had any previous episodes with similar symptoms, even if they were brief or resolved quickly? If so, what happened then, and how were they diagnosed and managed?"</p>
+        <p>"Just to clarify, which is your dominant hand?"</p>
+        <p>"Are you experiencing any pain right now? If so, where is it, how would you describe it, and what makes it better or worse?"</p>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <p>"Are you experiencing any other symptoms anywhere else in your body? For example, any chest pain, shortness of breath, or leg swelling? What about any dizziness, balance issues, or seizures? Have you had any unexplained weight loss or fever?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions? It's really important for us to know if you have any risk factors for stroke or TIA, such as high blood pressure, diabetes, high cholesterol, or a heart rhythm problem called atrial fibrillation (AF)? Have you had a previous stroke or TIA, or a heart attack? What about coronary artery disease, peripheral arterial disease, or carotid artery disease (narrowing of the arteries in your neck)? Do you have any known heart valve disease, or any clotting disorders? Do you suffer from migraines, particularly if they are associated with aura?"</p>
+        <p>"Have you ever had any operations or procedures, especially any heart, vascular, or brain surgery?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? I'm particularly interested if you're taking any blood thinners like warfarin or DOACs, or antiplatelet medications like aspirin or clopidogrel. Are you on any medications for high blood pressure or cholesterol? What about oral contraceptives or hormone replacement therapy?"</p>
+        <p>"Are you taking your current medications regularly as prescribed?"</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you have?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family – like your parents, siblings, or children – have a history of stroke, TIA, or heart disease, especially if it occurred at a young age? What about diabetes, high blood pressure, or inherited clotting disorders? If so, can you tell me at what age these conditions developed in your relatives?"</p>
+        <p>"Could you tell me a little about your living situation? What type of accommodation do you live in – are there stairs, for example? Who do you live with, and do you have a good support network around you? How do you manage with your daily activities, and how have these symptoms affected your ability to do them compared to before?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much and for how long? How much alcohol do you drink in a week? Do you use any recreational drugs, particularly stimulants like cocaine or amphetamines, or have a history of intravenous drug use?"</p>
+        <p>"What's your typical diet like – is it high in salt or fat? How about your weight? Do you exercise regularly?"</p>
+        <p>"What kind of work do you do? If your job involves working at heights or with heavy machinery, I must advise you that you should not return to work until we have fully investigated the cause of your symptoms and deemed it safe."</p>
+        <p>"Regarding driving, it is very important that you do not drive until you have been fully investigated for your TIA or stroke. You will also have to inform the relevant driving authority (for example, the DVLA in the UK) about this event, as there are specific regulations about driving after a stroke or TIA."</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <p>"Thank you very much for sharing all of that information with me. Just to summarise, you've experienced [recap key symptoms], which started at [onset time] and have [recap evolution]. This has impacted you by [recap impact on ADLs]. You've also mentioned [recap relevant PMH/DH/FH/SH]."</p>
+        <p>"Does that sound like an accurate summary? Is there anything else you feel is important that we haven't covered?"</p>
+        <p>"Based on what you've told me, the next steps would be for me to perform a thorough physical examination, focusing on your neurological and cardiovascular systems, and checking your vital signs. We would also likely arrange for some investigations, such as blood tests (like a full blood count, kidney and liver function tests, glucose, lipids, and a clotting screen), an ECG (heart tracing), and imaging. This imaging might include a CT scan of your head, an MRI of your brain, a CT angiogram to look at your blood vessels, or a carotid Doppler scan to check the arteries in your neck. Depending on the findings, we would also refer you urgently to the stroke team or a TIA clinic for rapid assessment and management."</p>
+        <p>"Do you have any questions for me at this stage?"</p>
+        <p>"Thank you for your time."</p>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

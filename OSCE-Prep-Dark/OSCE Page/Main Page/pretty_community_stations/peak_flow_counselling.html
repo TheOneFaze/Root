@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💨 Peak Flow (PEFR) Technique Counselling</title>
+  
+    <style>
+/* --- MASTER INLINE STYLES --- */
+
+/* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+html, body {
+    height: 100%; /* Ensure both html and body take full height of the viewport */
+    margin: 0;
+    padding: 0; /* Remove default browser padding/margin */
+    overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+}
+
+/* --- 1. Main Site Layout & Structure --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f4f9; /* Default light background */
+    color: #333; /* Default light text color */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.header-container, header { /* Styles for main headers on index and content pages */
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 25px 10px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: white; /* Header text color in light mode (default) */
+    /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+}
+
+.logo {
+    max-width: 100%;
+    height: auto;
+    max-height: 80px;
+}
+
+.container { /* For the main index page cards */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 40px 20px; /* Padding for the main card container */
+    box-sizing: border-box; /* Include padding in width/height calculation */
+}
+
+.card { /* For individual cards on the index page */
+    background-color: #ffffff;
+    padding: 20px;
+    width: 280px;
+    min-height: 80px;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 5px solid transparent; /* For theme color accent */
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+a {
+    text-decoration: none;
+    color: #333; /* Default link color in light mode */
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 14px;
+    color: #777; /* Default footer text color in light mode */
+    transition: color 0.3s;
+}
+
+/* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+.content-section {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    background: white; /* Default light background for content sections */
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.section-box { /* Individual boxes within content sections */
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h3 {
+    padding-left: 10px;
+    margin-top: 20px;
+    border-left-width: 5px;
+    border-left-style: solid;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+}
+
+/* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+.toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: #f0f0f0; /* Light background for the wrapper */
+    border-radius: 30px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 350px; /* Constrain width to look better */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.toggle-label {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666; /* Default text color */
+    transition: color 0.3s, background-color 0.3s;
+    border-radius: 20px; /* For the highlighted effect */
+    user-select: none; /* Prevent text selection on click */
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+    .toggle-label.active {
+        color: white; /* Text color when active */
+        background-color: #66bb6a; /* Default Green for active label (matches Medication theme) */
+        box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+    }
+
+/* Switch styling itself */
+.toggle-container {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    margin: 0 15px; /* Space between labels and switch */
+    flex-shrink: 0; /* Prevent shrinking on small screens */
+}
+
+    .toggle-container .switch {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc; /* Grey when off */
+        transition: .4s;
+        border-radius: 30px;
+    }
+
+        .toggle-container .switch:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-container .switch.active {
+            background-color: #66bb6a; /* Default Green when on (matches Medication theme) */
+        }
+
+            .toggle-container .switch.active:before {
+                transform: translateX(30px); /* Slide to the right */
+            }
+
+/* Styles for content sections being hidden/shown */
+.content-section {
+    display: none; /* Hidden by default */
+}
+
+    .content-section.active {
+        display: block; /* Shown when active */
+    }
+
+
+/* --- 2. Color Themes for LIGHT Mode --- */
+/* These define the specific colors for each station type when in LIGHT mode */
+
+/* Blue Theme (Diagnosis)
+   Primary: #0d47a1 (Dark Blue)
+   Accent: #42a5f5 (Lighter Blue)
+   Background: #e3f2fd (Very Light Blue) */
+.theme-blue header, .theme-blue h1, .theme-blue h2, .theme-blue a {
+    color: #0d47a1;
+}
+
+.theme-blue .section-box {
+    background: #e3f2fd;
+}
+
+.theme-blue h3 {
+    color: #0d47a1;
+    border-color: #42a5f5;
+}
+
+.theme-blue .header-container, .theme-blue header {
+    background: linear-gradient(to right, #42a5f5, #0d47a1);
+}
+
+.theme-blue .card {
+    border-color: #29b6f6;
+}
+/* For cards on main page */
+.theme-blue .toggle-label.active, .theme-blue .toggle-container .switch.active {
+    background-color: #42a5f5;
+}
+
+
+/* Green Theme (Medication)
+   Primary: #1b5e20 (Dark Green)
+   Accent: #66bb6a (Medium Green)
+   Background: #e8f5e9 (Very Light Green) */
+.theme-green header, .theme-green h1, .theme-green h2, .theme-green a {
+    color: #1b5e20;
+}
+
+.theme-green .section-box {
+    background: #e8f5e9;
+}
+
+.theme-green h3 {
+    color: #1b5e20;
+    border-color: #66bb6a;
+}
+
+.theme-green .header-container, .theme-green header {
+    background: linear-gradient(to right, #66bb6a, #1b5e20);
+}
+
+.theme-green .card {
+    border-color: #66bb6a;
+}
+/* For cards on main page */
+.theme-green .toggle-label.active, .theme-green .toggle-container .switch.active {
+    background-color: #66bb6a;
+}
+
+
+/* Orange Theme (Procedure)
+   Primary: #e65100 (Dark Orange)
+   Accent: #ffb74d (Lighter Orange)
+   Background: #fff3e0 (Very Light Orange) */
+.theme-orange header, .theme-orange h1, .theme-orange h2, .theme-orange a {
+    color: #e65100;
+}
+
+.theme-orange .section-box {
+    background: #fff3e0;
+}
+
+.theme-orange h3 {
+    color: #e65100;
+    border-color: #ffb74d;
+}
+
+.theme-orange .header-container, .theme-orange header {
+    background: linear-gradient(to right, #ffb74d, #e65100);
+}
+
+.theme-orange .card {
+    border-color: #ffa726;
+}
+/* For cards on main page */
+.theme-orange .toggle-label.active, .theme-orange .toggle-container .switch.active {
+    background-color: #ffa726;
+}
+
+
+/* Purple Theme (Post-Procedure/Psychiatry-related Medication)
+   Primary: #4a148c (Dark Purple)
+   Accent: #ce93d8 (Lighter Purple)
+   Background: #f3e5f5 (Very Light Purple) */
+.theme-purple header, .theme-purple h1, .theme-purple h2, .theme-purple a {
+    color: #4a148c;
+}
+
+.theme-purple .section-box {
+    background: #f3e5f5;
+}
+
+.theme-purple h3 {
+    color: #4a148c;
+    border-color: #ce93d8;
+}
+
+.theme-purple .header-container, .theme-purple header {
+    background: linear-gradient(to right, #ce93d8, #4a148c);
+}
+
+.theme-purple .card {
+    border-color: #ab47bc;
+}
+/* For cards on main page */
+.theme-purple .toggle-label.active, .theme-purple .toggle-container .switch.active {
+    background-color: #ab47bc;
+}
+
+
+/* Red Theme (Surgery)
+   Primary: #b71c1c (Dark Red)
+   Accent: #ef5350 (Medium Red)
+   Background: #ffebee (Very Light Red) */
+.theme-red header, .theme-red h1, .theme-red h2, .theme-red a {
+    color: #b71c1c;
+}
+
+.theme-red .section-box {
+    background: #ffebee;
+}
+
+.theme-red h3 {
+    color: #b71c1c;
+    border-color: #ef5350;
+}
+
+.theme-red .header-container, .theme-red header {
+    background: linear-gradient(to right, #ef5350, #b71c1c);
+}
+
+.theme-red .card {
+    border-color: #ef5350;
+}
+/* For cards on main page */
+.theme-red .toggle-label.active, .theme-red .toggle-container .switch.active {
+    background-color: #ef5350;
+}
+
+
+/* Terracotta Theme (Community)
+   Primary: #bf360c (Dark Terracotta)
+   Accent: #ffab91 (Lighter Terracotta)
+   Background: #fff3e0 (Very Light Peach) */
+.theme-terracotta header, .theme-terracotta h1, .theme-terracotta h2, .theme-terracotta a {
+    color: #bf360c;
+}
+
+.theme-terracotta .section-box {
+    background: #fff3e0;
+}
+
+.theme-terracotta h3 {
+    color: #bf360c;
+    border-color: #ffab91;
+}
+
+.theme-terracotta .header-container, .theme-terracotta header {
+    background: linear-gradient(to right, #ffab91, #bf360c);
+}
+
+.theme-terracotta .card {
+    border-color: #ff7043;
+}
+/* For cards on main page */
+.theme-terracotta .toggle-label.active, .theme-terracotta .toggle-container .switch.active {
+    background-color: #ff7043;
+}
+
+
+/* Teal Theme (Respiratory)
+   Primary: #004d40 (Dark Teal)
+   Accent: #4db6ac (Medium Teal)
+   Background: #e0f2f1 (Very Light Teal) */
+.theme-teal header, .theme-teal h1, .theme-teal h2, .theme-teal a {
+    color: #004d40;
+}
+
+.theme-teal .section-box {
+    background: #e0f2f1;
+}
+
+.theme-teal h3 {
+    color: #004d40;
+    border-color: #4db6ac;
+}
+
+.theme-teal .header-container, .theme-teal header {
+    background: linear-gradient(to right, #4db6ac, #004d40);
+}
+
+.theme-teal .card {
+    border-color: #4db6ac;
+}
+/* For cards on main page */
+.theme-teal .toggle-label.active, .theme-teal .toggle-container .switch.active {
+    background-color: #4db6ac;
+}
+
+
+/* Pink Theme (Diabetes)
+   Primary: #ad1457 (Dark Pink)
+   Accent: #f06292 (Medium Pink)
+   Background: #fce4ec (Very Light Pink) */
+.theme-pink header, .theme-pink h1, .theme-pink h2, .theme-pink a {
+    color: #ad1457;
+}
+
+.theme-pink .section-box {
+    background: #fce4ec;
+}
+
+.theme-pink h3 {
+    color: #ad1457;
+    border-color: #f06292;
+}
+
+.theme-pink .header-container, .theme-pink header {
+    background: linear-gradient(to right, #f06292, #ad1457);
+}
+
+.theme-pink .card {
+    border-color: #f06292;
+}
+/* For cards on main page */
+.theme-pink .toggle-label.active, .theme-pink .toggle-container .switch.active {
+    background-color: #f06292;
+}
+
+
+/* --- 3. Dark Mode Styles --- */
+/* These override the above themes when .dark-mode is active */
+body.dark-mode {
+    background: #1f2023;
+    color: #e0e0e0;
+}
+
+.dark-mode .card, .dark-mode .content-section {
+    background-color: #2f3136;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+.dark-mode .section-box {
+    background-color: #2a2c30;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.dark-mode a {
+    color: #e0e0e0;
+}
+/* Default link color in dark mode */
+.dark-mode footer {
+    color: #999;
+}
+
+.dark-mode h1, .dark-mode h2 {
+    color: #e0e0e0;
+}
+/* Header text color in dark mode */
+.dark-mode p, .dark-mode li {
+    color: #cccccc;
+}
+/* Ensure text inside boxes is readable */
+.dark-mode header {
+    color: white;
+}
+/* Ensure main header text is white in dark mode */
+
+/* Dark Mode Theme Overrides - Adjust header and border colors for contrast */
+.dark-mode.theme-blue header, .dark-mode.theme-blue h3, .dark-mode.theme-blue a {
+    color: #82b1ff;
+}
+/* Lighter blue */
+.dark-mode.theme-blue .toggle-label.active, .dark-mode.theme-blue .toggle-container .switch.active {
+    background-color: #82b1ff;
+}
+
+.dark-mode.theme-green header, .dark-mode.theme-green h3, .dark-mode.theme-green a {
+    color: #a5d6a7;
+}
+/* Lighter green */
+.dark-mode.theme-green .toggle-label.active, .dark-mode.theme-green .toggle-container .switch.active {
+    background-color: #a5d6a7;
+}
+
+.dark-mode.theme-orange header, .dark-mode.theme-orange h3, .dark-mode.theme-orange a {
+    color: #ffcc80;
+}
+/* Lighter orange */
+.dark-mode.theme-orange .toggle-label.active, .dark-mode.theme-orange .toggle-container .switch.active {
+    background-color: #ffcc80;
+}
+
+.dark-mode.theme-purple header, .dark-mode.theme-purple h3, .dark-mode.theme-purple a {
+    color: #e1bee7;
+}
+/* Lighter purple */
+.dark-mode.theme-purple .toggle-label.active, .dark-mode.theme-purple .toggle-container .switch.active {
+    background-color: #e1bee7;
+}
+
+.dark-mode.theme-red header, .dark-mode.theme-red h3, .dark-mode.theme-red a {
+    color: #ff8a80;
+}
+/* Lighter red */
+.dark-mode.theme-red .toggle-label.active, .dark-mode.theme-red .toggle-container .switch.active {
+    background-color: #ff8a80;
+}
+
+.dark-mode.theme-terracotta header, .dark-mode.theme-terracotta h3, .dark-mode.theme-terracotta a {
+    color: #ffccbc;
+}
+/* Lighter terracotta */
+.dark-mode.theme-terracotta .toggle-label.active, .dark-mode.theme-terracotta .toggle-container .switch.active {
+    background-color: #ffccbc;
+}
+
+.dark-mode.theme-teal header, .dark-mode.theme-teal h3, .dark-mode.theme-teal a {
+    color: #80cbc4;
+}
+/* Lighter teal */
+.dark-mode.theme-teal .toggle-label.active, .dark-mode.theme-teal .toggle-container .switch.active {
+    background-color: #80cbc4;
+}
+
+.dark-mode.theme-pink header, .dark-mode.theme-pink h3, .dark-mode.theme-pink a {
+    color: #f48fb1;
+}
+/* Lighter pink */
+.dark-mode.theme-pink .toggle-label.active, .dark-mode.theme-pink .toggle-container .switch.active {
+    background-color: #f48fb1;
+}
+
+
+/* --- 4. Media Queries for Mobile-Friendly Layout --- */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    /* Adjust padding for cards on smaller screens */
+    .card {
+        width: 45%;
+    }
+
+    .toggle-wrapper {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .toggle-label {
+        width: 80%;
+        text-align: center;
+    }
+
+    .toggle-container {
+        margin: 10px 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    /* Adjust padding for cards on very small screens */
+    .card {
+        width: 100%;
+    }
+
+    .content-section {
+        padding: 20px;
+        margin: 0 auto 30px;
+    }
+
+    .section-box {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.1em;
+    }
+}
+</style>
+</head>
+<body class="theme-teal">
+  <header>💨 Peak Flow (PEFR) Technique Counselling</header>
+
+    <div class="toggle-wrapper">
+      <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+      <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+      <div class="toggle-container">
+        <div class="switch" onclick="toggleSwitch(this)">
+          <div class="slider"></div>
+        </div>
+      </div>
+    </div>
+
+  
+  
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <ul>
+            <li><strong>Ideas:</strong> Ask what the patient knows about what a peak flow meter does.</li>
+            <li><strong>Concerns:</strong> Explore any worries they have, such as not performing the technique correctly.</li>
+            <li><strong>Expectations:</strong> Confirm the goal is to learn the correct technique for better asthma management.</li>
+        </ul>
+    </div>
+    <div class="section-box">
+        <h3>🤔 Explain the 'What' and 'Why'</h3>
+        <ul>
+            <li>Define PEFR: Peak Expiratory Flow Rate – how fast you can blow air out of your lungs.</li>
+            <li>Explain its importance: it helps monitor asthma, can spot worsening before major symptoms appear, and guides treatment adjustments.</li>
+        </ul>
+    </div>
+    <div class="section-box">
+        <h3>🛠️ The 'How' - Step-by-Step Technique</h3>
+        <ol>
+            <li>Stand or sit up straight.</li>
+            <li>Set the meter's pointer to zero.</li>
+            <li>Hold the meter horizontally, keeping fingers clear of the scale.</li>
+            <li>Take one deep breath in to fill the lungs completely.</li>
+            <li>Seal your lips tightly around the mouthpiece.</li>
+            <li>Blow out as <strong>hard and fast</strong> as possible in a single sharp puff.</li>
+            <li>Note the reading.</li>
+            <li>Repeat the process two more times (for a total of three blows).</li>
+            <li>Record the <strong>highest</strong> of the three readings in your diary.</li>
+        </ol>
+    </div>
+    <div class="section-box">
+        <h3>✅ Practice & Planning</h3>
+        <ul>
+            <li><strong>Teach-Back:</strong> Ask the patient to demonstrate the technique. Provide constructive feedback.</li>
+            <li><strong>Diary Keeping:</strong> Advise recording the best of three readings twice daily (morning and evening), along with any symptoms or reliever use.</li>
+            <li><strong>Action Plan:</strong> Explain that their 'personal best' will be used to set zones (e.g., green/amber/red). If readings drop (e.g., below 80% of their best), they should follow their asthma action plan.</li>
+            <li>Mention common mistakes to avoid: coughing, not sealing lips, or not blowing hard enough.</li>
+        </ul>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], the practice nurse. I understand we're going to go over how to use your peak flow meter today to help manage your asthma."</p>
+        <p>"I know you've been given one before. What's your current understanding of what it's for and how to use it?"</p>
+        <p>"It's also really common to worry about not doing it right, so our goal today is to make you feel confident with the technique."</p>
+    </div>
+    <div class="section-box">
+        <h3>🤔 The Purpose of Peak Flow</h3>
+        <p>"That's a great start. You're right, it measures how your lungs are working by checking how fast you can push air out. We call this your Peak Expiratory Flow Rate, or PEFR."</p>
+        <p>"It's a really useful tool because your PEFR can start to drop if your airways are narrowing, often before you even notice significant symptoms like wheezing. This gives us an early warning sign and helps us make sure your treatment is keeping your asthma well under control."</p>
+    </div>
+    <div class="section-box">
+        <h3>🛠️ Demonstrating the Technique</h3>
+        <p>"I'll demonstrate how to do it correctly, and then you can have a try. The most important part is a 'hard and fast' blow."</p>
+        <p>"First, you stand or sit up straight and make sure the little marker on the meter is pushed down to zero. You hold it horizontally, take a really deep breath in, seal your lips tightly around the mouthpiece, and then blow out as hard and as fast as you possibly can, in one sharp puff."</p>
+        <p>"You then look at the number the marker has moved to, note it down, and repeat the whole thing two more times. The number we care about is the highest score out of the three attempts."</p>
+    </div>
+    <div class="section-box">
+        <h3>✅ Patient Practice & Planning</h3>
+        <p>"Okay, now it's your turn. Would you like to have a go while I'm here to guide you?"</p>
+        <p>"Excellent, that was a great effort. To get the best picture of your asthma, we'll ask you to do this every morning and evening and record your highest score in a diary. It's also helpful to note down any symptoms you're having."</p>
+        <p>"Once we know your 'personal best' reading, we can use it to create an action plan. For example, if your readings drop below 80% of your best, that's a signal to follow the advice in your plan, which might be to temporarily increase your inhaler use."</p>
+        <p>"Does that make sense? Do you have any questions at all?"</p>
+    </div>
+  </div>
+
+  
+    
+    
+    
+    
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

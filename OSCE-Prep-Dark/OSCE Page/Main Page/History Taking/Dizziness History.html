@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Dizziness History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f4f9; /* Default light background */
+        color: #333; /* Default light text color */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    h3 {
+        padding-left: 10px;
+        margin-top: 20px;
+        border-left-width: 5px;
+        border-left-style: solid;
+        transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #66bb6a; /* Default Green for active label (matches Medication theme) */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #66bb6a; /* Default Green when on (matches Medication theme) */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #333; /* Default text color for labels */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: ; /* Fill color will be set by theme */
+        border-color: ; /* Border color will be set by theme */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        /* Remove previous margin-left and text-indent that caused issues */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* These define the specific colors for each station type when in LIGHT mode */
+
+    /* Blue Theme (Diagnosis)
+       Primary: #0d47a1 (Dark Blue)
+       Accent: #42a5f5 (Lighter Blue)
+       Background: #e3f2fd (Very Light Blue) */
+    .theme-blue header {
+        color: white; /* Header text color explicitly white */
+    }
+    .theme-blue h1, .theme-blue h2, .theme-blue a {
+        color: #0d47a1; /* Dark blue for h1, h2, a in light mode */
+    }
+
+    .theme-blue .section-box {
+        background: #e3f2fd;
+    }
+
+    .theme-blue h3 {
+        color: #0d47a1;
+        border-color: #42a5f5;
+    }
+
+    .theme-blue .header-container, .theme-blue header {
+        background: linear-gradient(to right, #42a5f5, #0d47a1);
+    }
+
+    .theme-blue .card {
+        border-color: #29b6f6;
+    }
+    /* For cards on main page */
+    .theme-blue .toggle-label.active, .theme-blue .toggle-container .switch.active {
+        background-color: #42a5f5;
+    }
+    /* Checkbox styling for blue theme */
+    .theme-blue .section-box label input[type="checkbox"] {
+        border-color: #0d47a1;
+    }
+    .theme-blue .section-box label input[type="checkbox"]:checked {
+        background-color: #0d47a1;
+        border-color: #0d47a1;
+    }
+
+
+    /* Green Theme (Medication)
+       Primary: #1b5e20 (Dark Green)
+       Accent: #66bb6a (Medium Green)
+       Background: #e8f5e9 (Very Light Green) */
+    .theme-green header {
+        color: white; /* Header text color explicitly white */
+    }
+    .theme-green h1, .theme-green h2, .theme-green a {
+        color: #1b5e20; /* Dark green for h1, h2, a in light mode */
+    }
+
+    .theme-green .section-box {
+        background: #e8f5e9;
+    }
+
+    .theme-green h3 {
+        color: #1b5e20;
+        border-color: #66bb6a;
+    }
+
+    .theme-green .header-container, .theme-green header {
+        background: linear-gradient(to right, #66bb6a, #1b5e20);
+    }
+
+    .theme-green .card {
+        border-color: #66bb6a;
+    }
+    /* For cards on main page */
+    .theme-green .toggle-label.active, .theme-green .toggle-container .switch.active {
+        background-color: #66bb6a;
+    }
+    /* Checkbox styling for green theme */
+    .theme-green .section-box label input[type="checkbox"] {
+        border-color: #1b5e20;
+    }
+    .theme-green .section-box label input[type="checkbox"]:checked {
+        background-color: #1b5e20;
+        border-color: #1b5e20;
+    }
+
+
+    /* Orange Theme (Procedure)
+       Primary: #e65100 (Dark Orange)
+       Accent: #ffb74d (Lighter Orange)
+       Background: #fff3e0 (Very Light Orange) */
+    .theme-orange header {
+        color: white; /* Header text color explicitly white */
+    }
+    .theme-orange h1, .theme-orange h2, .theme-orange a {
+        color: #e65100; /* Dark orange for h1, h2, a in light mode */
+    }
+
+    .theme-orange .section-box {
+        background: #fff3e0;
+    }
+
+    .theme-orange h3 {
+        color: #e65100;
+        border-color: #ffb74d;
+    }
+
+    .theme-orange .header-container, .theme-orange header {
+        background: linear-gradient(to right, #ffb74d, #e65100);
+    }
+
+    .theme-orange .card {
+        border-color: #ffa726;
+    }
+    /* For cards on main page */
+    .theme-orange .toggle-label.active, .theme-orange .toggle-container .switch.active {
+        background-color: #ffa726;
+    }
+    /* Checkbox styling for orange theme */
+    .theme-orange .section-box label input[type="checkbox"] {
+        border-color: #e65100; /* Darker orange for border */
+    }
+    .theme-orange .section-box label input[type="checkbox"]:checked {
+        background-color: #e65100; /* Darker orange for checked background */
+        border-color: #e65100;
+    }
+
+
+    /* Purple Theme (Post-Procedure/Psychiatry-related Medication)
+       Primary: #4a148c (Dark Purple)
+       Accent: #ce93d8 (Lighter Purple)
+       Background: #f3e5f5 (Very Light Purple) */
+    .theme-purple header, .theme-purple h1, .theme-purple h2, .theme-purple a {
+        color: #4a148c;
+    }
+
+    .theme-purple .section-box {
+        background: #f3e5f5;
+    }
+
+    .theme-purple h3 {
+        color: #4a148c;
+        border-color: #ce93d8;
+    }
+
+    .theme-purple .header-container, .theme-purple header {
+        background: linear-gradient(to right, #ce93d8, #4a148c);
+    }
+
+    .theme-purple .card {
+        border-color: #ab47bc;
+    }
+    /* For cards on main page */
+    .theme-purple .toggle-label.active, .theme-purple .toggle-container .switch.active {
+        background-color: #ab47bc;
+    }
+
+
+    /* Red Theme (Surgery)
+       Primary: #b71c1c (Dark Red)
+       Accent: #ef5350 (Medium Red)
+       Background: #ffebee (Very Light Red) */
+    .theme-red header, .theme-red h1, .theme-red h2, .theme-red a {
+        color: #b71c1c;
+    }
+
+    .theme-red .section-box {
+        background: #ffebee;
+    }
+
+    .theme-red h3 {
+        color: #b71c1c;
+        border-color: #ef5350;
+    }
+
+    .theme-red .header-container, .theme-red header {
+        background: linear-gradient(to right, #ef5350, #b71c1c);
+    }
+
+    .theme-red .card {
+        border-color: #ef5350;
+    }
+    /* For cards on main page */
+    .theme-red .toggle-label.active, .theme-red .toggle-container .switch.active {
+        background-color: #ef5350;
+    }
+
+
+    /* Terracotta Theme (Community)
+       Primary: #bf360c (Dark Terracotta)
+       Accent: #ffab91 (Lighter Terracotta)
+       Background: #fff3e0 (Very Light Peach) */
+    .theme-terracotta header {
+        color: white; /* Header text color explicitly white */
+    }
+    .theme-terracotta h1, .theme-terracotta h2, .theme-terracotta a {
+        color: #bf360c; /* Dark terracotta for h1, h2, a in light mode */
+    }
+
+    .theme-terracotta .section-box {
+        background: #fff3e0;
+    }
+
+    .theme-terracotta h3 {
+        color: #bf360c;
+        border-color: #ffab91;
+    }
+
+    .theme-terracotta .header-container, .theme-terracotta header {
+        background: linear-gradient(to right, #ffab91, #bf360c);
+    }
+
+    .theme-terracotta .card {
+        border-color: #ff7043;
+    }
+    /* For cards on main page */
+    .theme-terracotta .toggle-label.active, .theme-terracotta .toggle-container .switch.active {
+        background-color: #ff7043;
+    }
+    /* Checkbox styling for terracotta theme */
+    .theme-terracotta .section-box label input[type="checkbox"] {
+        border-color: #bf360c;
+    }
+    .theme-terracotta .section-box label input[type="checkbox"]:checked {
+        background-color: #bf360c;
+        border-color: #bf360c;
+    }
+
+
+    /* Teal Theme (Respiratory)
+       Primary: #004d40 (Dark Teal)
+       Accent: #4db6ac (Medium Teal)
+       Background: #e0f2f1 (Very Light Teal) */
+    .theme-teal header, .theme-teal h1, .theme-teal h2, .theme-teal a {
+        color: #004d40;
+    }
+
+    .theme-teal .section-box {
+        background: #e0f2f1;
+    }
+
+    .theme-teal h3 {
+        color: #004d40;
+        border-color: #4db6ac;
+    }
+
+    .theme-teal .header-container, .theme-teal header {
+        background: linear-gradient(to right, #4db6ac, #004d40);
+    }
+
+    .theme-teal .card {
+        border-color: #4db6ac;
+    }
+    /* For cards on main page */
+    .theme-teal .toggle-label.active, .theme-teal .toggle-container .switch.active {
+        background-color: #4db6ac;
+    }
+
+
+    /* Pink Theme (Diabetes)
+       Primary: #ad1457 (Dark Pink)
+       Accent: #f06292 (Medium Pink)
+       Background: #fce4ec (Very Light Pink) */
+    .theme-pink header, .theme-pink h1, .theme-pink h2, .theme-pink a {
+        color: #ad1457;
+    }
+
+    .theme-pink .section-box {
+        background: #fce4ec;
+    }
+
+    .theme-pink h3 {
+        color: #ad1457;
+        border-color: #f06292;
+    }
+
+    .theme-pink .header-container, .theme-pink header {
+        background: linear-gradient(to right, #f06292, #ad1457);
+    }
+
+    .theme-pink .card {
+        border-color: #f06292;
+    }
+    /* For cards on main page */
+    .theme-pink .toggle-label.active, .theme-pink .toggle-container .switch.active {
+        background-color: #f06292;
+    }
+
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    /* Default link color in dark mode */
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    /* Header text color in dark mode */
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    /* Ensure text inside boxes is readable */
+    .dark-mode header {
+        color: white;
+    }
+    /* Ensure main header text is white in dark mode */
+
+    /* Dark Mode Theme Overrides - Adjust header and border colors for contrast */
+    .dark-mode.theme-blue header, .dark-mode.theme-blue h3, .dark-mode.theme-blue a {
+        color: #82b1ff;
+    }
+    /* Lighter blue */
+    .dark-mode.theme-blue .toggle-label.active, .dark-mode.theme-blue .toggle-container .switch.active {
+        background-color: #82b1ff;
+    }
+
+    .dark-mode.theme-green header, .dark-mode.theme-green h3, .dark-mode.theme-green a {
+        color: #a5d6a7;
+    }
+    /* Lighter green */
+    .dark-mode.theme-green .toggle-label.active, .dark-mode.theme-green .toggle-container .switch.active {
+        background-color: #a5d6a7;
+    }
+
+    .dark-mode.theme-orange header, .dark-mode.theme-orange h3, .dark-mode.theme-orange a {
+        color: #ffcc80;
+    }
+    /* Lighter orange */
+    .dark-mode.theme-orange .toggle-label.active, .dark-mode.theme-orange .toggle-container .switch.active {
+        background-color: #ffcc80;
+    }
+    /* Dark mode checkbox styling for orange theme */
+    .dark-mode.theme-orange .section-box label input[type="checkbox"] {
+        border-color: #ffcc80; /* Lighter orange for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-orange .section-box label input[type="checkbox"]:checked {
+        background-color: #ffcc80; /* Lighter orange for checked background in dark mode */
+        border-color: #ffcc80;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+
+    .dark-mode.theme-purple header, .dark-mode.theme-purple h3, .dark-mode.theme-purple a {
+        color: #e1bee7;
+    }
+    /* Lighter purple */
+    .dark-mode.theme-purple .toggle-label.active, .dark-mode.theme-purple .toggle-container .switch.active {
+        background-color: #e1bee7;
+    }
+
+    .dark-mode.theme-red header, .dark-mode.theme-red h3, .dark-mode.theme-red a {
+        color: #ff8a80;
+    }
+    /* Lighter red */
+    .dark-mode.theme-red .toggle-label.active, .dark-mode.theme-red .toggle-container .switch.active {
+        background-color: #ff8a80;
+    }
+
+    .dark-mode.theme-terracotta header, .dark-mode.theme-terracotta h3, .dark-mode.theme-terracotta a {
+        color: #ffccbc;
+    }
+    /* Lighter terracotta */
+    .dark-mode.theme-terracotta .toggle-label.active, .dark-mode.theme-terracotta .toggle-container .switch.active {
+        background-color: #ffccbc;
+    }
+
+    .dark-mode.theme-teal header, .dark-mode.theme-teal h3, .dark-mode.theme-teal a {
+        color: #80cbc4;
+    }
+    /* Lighter teal */
+    .dark-mode.theme-teal .toggle-label.active, .dark-mode.theme-teal .toggle-container .switch.active {
+        background-color: #80cbc4;
+    }
+
+    .dark-mode.theme-pink header, .dark-mode.theme-pink h3, .dark-mode.theme-pink a {
+        color: #f48fb1;
+    }
+    /* Lighter pink */
+    .dark-mode.theme-pink .toggle-label.active, .dark-mode.theme-pink .toggle-container .switch.active {
+        background-color: #f48fb1;
+    }
+
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        /* Adjust padding for cards on smaller screens */
+        .card {
+            width: 45%;
+        }
+
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        /* Adjust padding for cards on very small screens */
+        .card {
+            width: 100%;
+        }
+
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-terracotta"> <!-- Changed to theme-terracotta for Dizziness -->
+  <header>📝 Dizziness History OSCE Checklist</header>
+
+    <div class="toggle-wrapper">
+      <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+      <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+      <div class="toggle-container">
+        <div class="switch" onclick="toggleSwitch(this)">
+          <div class="slider"></div>
+        </div>
+      </div>
+    </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their dizziness?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about the dizziness (e.g., serious underlying condition)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💫 History of Presenting Complaint (SOCRATES + Dizziness-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Onset:</strong> <span>When did it start? Sudden or gradual?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Character:</strong> <span>Describe the dizziness (e.g., spinning sensation/vertigo, lightheadedness/pre-syncope, imbalance/disequilibrium, non-specific).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms:</strong> <span>Nausea, vomiting, headache, hearing loss (unilateral/bilateral), tinnitus, ear fullness, neurological symptoms (e.g., weakness, numbness, double vision, speech changes), visual symptoms.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Timing:</strong> <span>How has it changed over time? Discrete episodes or continuous? How long do episodes last?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Triggers:</strong> <span>Identify any triggers (e.g., positional changes, head movements, standing up quickly, exertion, stress, specific foods/drinks).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Severity:</strong> <span>On a scale of 1-10, how bad is it? How does it affect daily life (e.g., falls, driving)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Exacerbating/Relieving Factors:</strong> <span>What makes it better or worse (e.g., rest, lying down, medication)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Red Flags:</strong> <span>Sudden severe headache, focal neurological deficit (e.g., new weakness/numbness), acute unilateral hearing loss, severe vertigo, presence of vascular risk factors, exertional symptoms, recurrent falls.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Existing medical conditions: hypertension, diabetes, heart disease (arrhythmias, heart failure), stroke/TIA, migraines, ear infections, thyroid disorders, anaemia.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (e.g., ear surgery).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially those that can cause dizziness as a side effect (e.g., anti-hypertensives, diuretics, sedatives, antidepressants, ototoxic drugs).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Cardiovascular or neurological conditions (e.g., migraines, Meniere's disease, epilepsy) in first-degree relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation, social support, ADLs, occupation (identify high-risk activities).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking, alcohol intake, recreational drug use, fluid intake, diet, exercise.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Driving: Advise on driving safety if dizziness impacts ability.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., neurological/cardiovascular examination, ENT assessment, blood tests, ECG, imaging).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today because you've been experiencing dizziness. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing this dizziness, or what it might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💫 Exploring the Dizziness (SOCRATES + Dizziness-Specific)</h3>
+        <p>"Could you describe your dizziness for me? When did it first start, and did it come on suddenly or gradually?"</p>
+        <p>"It's really important to understand exactly what 'dizziness' feels like for you, as it can mean different things to different people. Does it feel like the room is spinning around you, or that you yourself are spinning (we call this vertigo)? Or do you feel lightheaded, like you might faint? Or perhaps just generally unsteady or off-balance?"</p>
+        <p>"Have you noticed any other symptoms happening with the dizziness? Like nausea or vomiting? Any headache? Changes in your hearing, like ringing in your ears (tinnitus) or a feeling of fullness in your ear? What about any weakness, numbness, double vision, or changes in your speech?"</p>
+        <p>"How often does this dizziness occur, and how long does each episode last? Is it constant, or does it come and go?"</p>
+        <p>"Are there any specific triggers for your dizziness? For example, does it happen when you change position, like sitting up or lying down? Or when you move your head quickly? Does it happen with exertion, or when you're feeling stressed?"</p>
+        <p>"On a scale of 1 to 10, how severe is this dizziness, and how has it been affecting your daily life? For example, has it caused you to fall, or affected your ability to drive?"</p>
+        <p>"What makes the dizziness better or worse? Does resting help, or lying down?"</p>
+        <p>"I also need to ask about some important 'red flag' symptoms. Have you had a sudden, severe headache with the dizziness? Any new weakness, numbness, or problems with your vision or speech? Any sudden loss of hearing in one ear? Or does the dizziness only happen when you exert yourself?"</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions, such as high blood pressure, diabetes, heart conditions (like an irregular heartbeat or heart failure), a history of strokes or mini-strokes (TIAs), migraines, or ear infections? What about thyroid problems or anaemia?"</p>
+        <p>"Have you ever had any operations or procedures, especially any ear surgery?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? Some medications, like those for blood pressure, water tablets, or certain antidepressants, can sometimes cause dizziness as a side effect."</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you have?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family have a history of heart conditions, neurological conditions like migraines or epilepsy, or Meniere's disease?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have a good support network around you? Are you able to manage all your daily activities? What kind of work do you do, and are there any high-risk activities involved?"</p>
+        <p>"Do you smoke, and if so, how much? How much alcohol do you drink in a week? Do you use any recreational drugs?"</p>
+        <p>"What's your typical fluid intake like? How about your diet and exercise habits?"</p>
+        <p>"Regarding driving, it's very important that you do not drive if your dizziness affects your ability to do so safely. We can discuss this further."</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <p>"Thank you very much for sharing all of that information with me. Just to summarise, you've been experiencing [recap key symptoms and type of dizziness], which started [onset] and are often [character/timing]. You've also mentioned [recap relevant PMH/DH/FH/SH]."</p>
+        <p>"Does that sound like an accurate summary? Is there anything else you feel is important that we haven't covered?"</p>
+        <p>"Based on what you've told me, the next steps would be for me to perform a physical examination focusing on your neurological and cardiovascular systems, and potentially your ears. We might also consider some investigations, such as blood tests, an ECG (heart tracing), or imaging, to understand what's causing your dizziness."</p>
+        <p>"Do you have any questions for me at this stage?"</p>
+        <p>"Thank you for your time."</p>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>

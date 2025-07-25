@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+          <script>
+        // Check if the user is NOT authenticated for the current session.
+        // This must run before any content is rendered to prevent flicker.
+        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
+            // Redirect to the login page.
+            // Ensure this path is correct relative to the root of your GitHub Pages site.
+            window.location.href = '/OSCE-Prep-Dark/OSCE%20Page/login.html';
+        }
+        // *** REMOVED: sessionStorage.removeItem('isAuthenticated'); ***
+        // Removing this line fixes the refresh loop.
+        // The 'isAuthenticated' flag will now persist in sessionStorage until the tab/PWA is closed.
+    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📝 Unintentional Weight Loss History OSCE Checklist</title>
+  <style>
+    /* --- MASTER INLINE STYLES --- */
+
+    /* --- 0. Base HTML and Body Setup (Crucial for full background) --- */
+    html, body {
+        height: 100%; /* Ensure both html and body take full height of the viewport */
+        margin: 0;
+        padding: 0; /* Remove default browser padding/margin */
+        overflow-x: hidden; /* Prevent horizontal scrollbar from overflow */
+    }
+
+    /* --- 1. Main Site Layout & Structure --- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f5f0; /* Very light, warm off-white for background */
+        color: #6d5b4e; /* Muted dark brown for text */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .header-container, header { /* Styles for main headers on index and content pages */
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 25px 10px;
+        font-size: 1.8em;
+        font-weight: bold;
+        color: white; /* Header text color explicitly white */
+        /* Will be overridden by theme-specific header colors, but dark mode should revert to white */
+    }
+
+    .logo {
+        max-width: 100%;
+        height: auto;
+        max-height: 80px;
+    }
+
+    .container { /* For the main index page cards */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 25px;
+        padding: 40px 20px; /* Padding for the main card container */
+        box-sizing: border-box; /* Include padding in width/height calculation */
+    }
+
+    .card { /* For individual cards on the index page */
+        background-color: #ffffff;
+        padding: 20px;
+        width: 280px;
+        min-height: 80px;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 5px solid transparent; /* For theme color accent */
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    a {
+        text-decoration: none;
+        color: #333; /* Default link color in light mode */
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    footer {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: #777; /* Default footer text color in light mode */
+        transition: color 0.3s;
+    }
+
+    /* Content Page Specific Styles (for sections like Benefits, Risks, etc.) */
+    .content-section {
+        max-width: 720px;
+        margin: 0 auto 40px;
+        background: white; /* Default light background for content sections */
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .section-box { /* Individual boxes within content sections */
+      background: white;
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin: 25px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    h2 {
+      color: #a38b70; /* Muted medium brown for section titles */
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #b8a68c; /* A slightly lighter, comforting brown for subheadings */
+      border-left: 5px solid #b89b78; /* Matches the deeper brown from the header gradient */
+      padding-left: 10px;
+      margin-top: 30px;
+      border-left-width: 5px; /* Ensures consistent border width */
+      border-left-style: solid; /* Ensures consistent border style */
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin-bottom: 15px;
+    }
+
+    /* Styles for High-Yield/Full Script Toggle (labels above the switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: #f0f0f0; /* Light background for the wrapper */
+        border-radius: 30px;
+        padding: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 350px; /* Constrain width to look better */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .toggle-label {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #666; /* Default text color */
+        transition: color 0.3s, background-color 0.3s;
+        border-radius: 20px; /* For the highlighted effect */
+        user-select: none; /* Prevent text selection on click */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+        .toggle-label.active {
+            color: white; /* Text color when active */
+            background-color: #d4b597; /* Soft tan for active label */
+            box-shadow: 0 0 0 rgba(0,0,0,0); /* REMOVED STICKING OUT SHADOW */
+        }
+
+    /* Switch styling itself */
+    .toggle-container {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        margin: 0 15px; /* Space between labels and switch */
+        flex-shrink: 0; /* Prevent shrinking on small screens */
+    }
+
+        .toggle-container .switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Grey when off */
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+            .toggle-container .switch:before {
+                position: absolute;
+                content: "";
+                height: 22px;
+                width: 22px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            .toggle-container .switch.active {
+                background-color: #d4b597; /* Soft tan when on */
+            }
+
+                .toggle-container .switch.active:before {
+                    transform: translateX(30px); /* Slide to the right */
+                }
+
+    /* Styles for content sections being hidden/shown */
+    .content-section {
+        display: none; /* Hidden by default */
+    }
+
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    /* Custom Checkbox Styling */
+    .section-box label {
+        display: flex; /* Use flexbox for alignment */
+        align-items: flex-start; /* Align items to the start to prevent text from going up and down */
+        margin-bottom: 12px; /* Space between checklist items */
+        cursor: pointer;
+        font-size: 1.05em; /* Slightly larger text for readability */
+        color: #6d5b4e; /* Default text color for labels */
+        transition: color 0.3s;
+    }
+
+    .section-box label input[type="checkbox"] {
+        /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Custom checkbox style */
+        width: 20px;
+        height: 20px;
+        border: 2px solid; /* Border color will be set by theme */
+        border-radius: 5px; /* Slightly rounded corners */
+        margin-right: 10px; /* Space between checkbox and text */
+        position: relative;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff; /* White background for checkbox */
+        transition: background-color 0.3s, border-color 0.3s;
+        flex-shrink: 0; /* Prevent checkbox from shrinking */
+        margin-top: 2px; /* Adjust vertical alignment slightly */
+    }
+
+    .section-box label input[type="checkbox"]:checked {
+        background-color: #b89b78; /* Deeper brown for checked background */
+        border-color: #b89b78; /* Deeper brown for checked border */
+    }
+
+    .section-box label input[type="checkbox"]:checked::before {
+        content: '✔'; /* Checkmark symbol */
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 14px;
+        color: white; /* Checkmark color */
+    }
+
+    /* New styles for aligning bold text and descriptions */
+    .section-box label .checkbox-content {
+        display: block; /* Change to block to allow full width for content */
+        flex-grow: 1; /* Allow content to take available space */
+    }
+
+    .section-box label .checkbox-content strong {
+        display: inline; /* Keep strong inline */
+        margin-right: 5px; /* Space between bold text and description */
+    }
+
+    .section-box label .checkbox-content span {
+        display: inline; /* Allow span to flow naturally */
+        margin-left: 0;
+        text-indent: 0;
+    }
+
+    /* --- 2. Color Themes for LIGHT Mode --- */
+    /* Applied theme-warm-brown based on existing colors */
+    .theme-warm-brown body {
+        background: #f8f5f0;
+        color: #6d5b4e;
+    }
+    .theme-warm-brown header {
+        color: white;
+        background: linear-gradient(to right, #d4b597, #b89b78); /* Soft tan to warm brown gradient */
+    }
+    .theme-warm-brown h1, .theme-warm-brown h2, .theme-warm-brown a {
+        color: #a38b70; /* Muted medium brown for titles */
+    }
+    .theme-warm-brown .section-box {
+        background: white;
+    }
+    .theme-warm-brown h3 {
+        color: #b8a68c; /* Slightly lighter, comforting brown for subheadings */
+        border-color: #b89b78; /* Matches the deeper brown from the header gradient */
+    }
+    .theme-warm-brown .toggle-label.active, .theme-warm-brown .toggle-container .switch.active {
+        background-color: #d4b597; /* Soft tan for active toggle */
+    }
+    .theme-warm-brown .section-box label input[type="checkbox"] {
+        border-color: #b89b78;
+    }
+    .theme-warm-brown .section-box label input[type="checkbox"]:checked {
+        background-color: #b89b78;
+        border-color: #b89b78;
+    }
+
+    /* --- 3. Dark Mode Styles --- */
+    /* These override the above themes when .dark-mode is active */
+    body.dark-mode {
+        background: #1f2023;
+        color: #e0e0e0;
+    }
+
+    .dark-mode .card, .dark-mode .content-section {
+        background-color: #2f3136;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+
+    .dark-mode .section-box {
+        background-color: #2a2c30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .dark-mode a {
+        color: #e0e0e0;
+    }
+    .dark-mode footer {
+        color: #999;
+    }
+
+    .dark-mode h1, .dark-mode h2 {
+        color: #e0e0e0;
+    }
+    .dark-mode p, .dark-mode li {
+        color: #cccccc;
+    }
+    .dark-mode header {
+        color: white;
+    }
+
+    /* Dark Mode Theme Overrides for Warm Brown */
+    .dark-mode.theme-warm-brown header {
+        color: white;
+        background: linear-gradient(to right, #e0c8b3, #d4b597); /* Lighter warm brown gradient for dark mode */
+    }
+    .dark-mode.theme-warm-brown h3, .dark-mode.theme-warm-brown a {
+        color: #e0c8b3; /* Lighter warm brown for dark mode headings */
+    }
+    .dark-mode.theme-warm-brown .toggle-label.active, .dark-mode.theme-warm-brown .toggle-container .switch.active {
+        background-color: #e0c8b3; /* Lighter warm brown for dark mode active toggle */
+    }
+    .dark-mode.theme-warm-brown .section-box label input[type="checkbox"] {
+        border-color: #e0c8b3; /* Lighter warm brown for border in dark mode */
+        background-color: #2a2c30; /* Dark background for checkbox in dark mode */
+    }
+    .dark-mode.theme-warm-brown .section-box label input[type="checkbox"]:checked {
+        background-color: #e0c8b3; /* Lighter warm brown for checked background in dark mode */
+        border-color: #e0c8b3;
+    }
+    .dark-mode .section-box label {
+        color: #e0e0e0; /* Ensure text color is light in dark mode */
+    }
+
+    /* --- 4. Media Queries for Mobile-Friendly Layout --- */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+        .card {
+            width: 45%;
+        }
+        .toggle-wrapper {
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .toggle-label {
+            width: 80%;
+            text-align: center;
+        }
+        .toggle-container {
+            margin: 10px 0;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 15px;
+        }
+        .card {
+            width: 100%;
+        }
+        .content-section {
+            padding: 20px;
+            margin: 0 auto 30px;
+        }
+        .section-box {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.1em;
+        }
+    }
+  </style>
+</head>
+<body class="theme-warm-brown"> <header>📝 Unintentional Weight Loss History OSCE Checklist</header>
+
+  <div class="toggle-wrapper">
+    <span id="highYieldLabel" class="toggle-label active" onclick="showContent('highYield')">High-Yield Notes</span>
+    <span id="fullScriptLabel" class="toggle-label" onclick="showContent('fullScript')">Full Script</span>
+    <div class="toggle-container">
+      <div class="switch" onclick="toggleSwitch(this)">
+        <div class="slider"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highYield" class="content-section active">
+    <h2>High-Yield OSCE Points 🧠</h2>
+    <div class="section-box">
+        <h3>💬 Introduction & ICE</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Wash hands, introduce, confirm patient details, explain purpose, gain consent.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Ideas:</strong> <span>What does the patient think is causing their weight loss?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Concerns:</strong> <span>Any worries about the weight loss (e.g., serious underlying illness, impact on health)?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Expectations:</strong> <span>What do they hope to achieve from the consultation (e.g., diagnosis, reversal of weight loss)?</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>⚖️ History of Presenting Complaint (Weight Loss-Specific)</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Weight Loss Details:</strong> <span>Establish a history of unintentional weight loss (not trying to lose weight).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Amount:</strong> <span>Clarify the amount of weight that has been lost (e.g., in kg or stone, or comparison of clothing/belt sizes). Ask for a baseline weight if known.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Time Frame:</strong> <span>Establish the time frame in which the weight has been lost (e.g., over 3 months, 6 months, 1 year). Rapid weight loss is more concerning.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Appetite:</strong> <span>Ask about appetite – increased, decreased, or unchanged? Any changes in taste or food aversions? Early satiety?</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Eating Habits:</strong> <span>Ask about eating habits and meal patterns to establish caloric intake (e.g., number/size of meals, snacks, fluid intake, changes in diet due to symptoms like dysphagia, nausea).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Exercise:</strong> <span>Ask about exercise – including how much and what kind of exercise (any recent increase in physical activity).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Associated Symptoms (Systemic):</strong> <span>Ask about associated symptoms that might indicate underlying pathology:
+                <ul>
+                    <li><input type="checkbox"> <strong>Constitutional symptoms:</strong> <span>Fever, night sweats, fatigue/tiredness, malaise.</span></li>
+                    <li><input type="checkbox"> <strong>Gastrointestinal:</strong> <span>Dysphagia (difficulty swallowing), odynophagia (painful swallowing), abdominal pain, nausea, vomiting, early satiety, changes in bowel habits (diarrhoea, constipation), melaena (black, tarry stools), fresh rectal bleeding, jaundice.</span></li>
+                    <li><input type="checkbox"> <strong>Respiratory:</strong> <span>Cough, haemoptysis (coughing up blood), shortness of breath.</span></li>
+                    <li><input type="checkbox"> <strong>Endocrine:</strong> <span>Increased thirst (polydipsia), increased urination (polyuria), heat/cold intolerance, palpitations, tremor.</span></li>
+                    <li><input type="checkbox"> <strong>Neurological:</strong> <span>Headache, visual changes, weakness, numbness.</span></li>
+                    <li><input type="checkbox"> <strong>Psychological:</strong> <span>Low mood, anxiety, anhedonia (loss of pleasure), body image concerns.</span></li>
+                    <li><input type="checkbox"> <strong>Pain:</strong> <span>Any new or persistent pain.</span></li>
+                </ul>
+                </span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Red Flags:</strong> <span>Rapid unintentional weight loss (>5% body weight in 6-12 months), constitutional symptoms (fever, night sweats, severe fatigue), persistent dysphagia/odynophagia, persistent abdominal pain, melaena, haemoptysis, persistent cough, unexplained lumps/bumps, jaundice, new neurological symptoms.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Screen for relevant symptoms in other body systems to identify any other clues to the underlying cause.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if the patient has any medical conditions (e.g., diabetes (especially new onset or poorly controlled), thyroid disorders (hyperthyroidism), inflammatory bowel disease, coeliac disease, chronic infections (e.g., HIV, TB), chronic kidney disease, chronic liver disease, malabsorption syndromes, mental health conditions (e.g., depression, anxiety, eating disorders), malignancy).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Previous surgeries or procedures (especially gastrointestinal surgery, bariatric surgery).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>In women:</strong> <span>Take a focused gynaecological history (e.g., menstrual regularity, pregnancy history, menopausal status).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Current medications (prescribed, OTC, herbal) – especially metformin, thyroid hormones, stimulants (e.g., for ADHD), antidepressants (SSRIs can cause initial weight loss), chemotherapy, or new medications.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Recent medication changes.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Known allergies and reactions.</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Family History:</strong> <span>Any family history of malignancy (especially GI cancers, breast, ovarian), autoimmune diseases, thyroid disorders, or malabsorption syndromes in first-degree relatives.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Social Context:</strong> <span>Living situation (who they live with, cooking facilities, access to food), social support, ability to manage independently with ADLs, financial difficulties (can affect food access).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Lifestyle:</strong> <span>Smoking history, alcohol intake, recreational drug use. Diet, fluid intake, exercise levels. Stress levels.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <strong>Recent Travel:</strong> <span>Recent travel to areas with endemic infections (e.g., TB, parasitic infections).</span>
+            </div>
+        </label>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., physical examination, vital signs, anthropometric measurements, blood tests - FBC, U&Es, LFTs, TFTs, CRP, ESR, HbA1c, coeliac screen, tumour markers if indicated; urine dipstick; stool tests; imaging - CXR, abdominal ultrasound, CT scan; endoscopy/colonoscopy; referral to specialist).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+  <div id="fullScript" class="content-section">
+    <h2>Full Word-for-Word OSCE Script 📜</h2>
+    <div class="section-box">
+        <h3>💬 Opening and Understanding</h3>
+        <p>"Hello, I’m [Your Name], one of the doctors/nurses. I understand you've come in today because you've noticed you've been losing weight without trying. Is that right?"</p>
+        <p>"Before we go any further, what are your thoughts about what might be causing this weight loss, or what it might mean?"</p>
+        <p>"And is there anything in particular that you're worried about, or anything you were hoping we could achieve during our conversation today?"</p>
+    </div>
+    <div class="section-box">
+        <h3>⚖️ Exploring the Weight Loss (Weight Loss-Specific)</h3>
+        <p>"Could you please tell me more about your weight loss? Has it been unintentional, meaning you haven't been trying to lose weight?"</p>
+        <p>"How much weight have you lost? Do you know your current weight, or what your weight was before you started losing it? Sometimes people can tell by how their clothes fit, or if their belt size has changed."</p>
+        <p>"Over what period of time have you lost this weight? For example, has it been over the last 3 months, 6 months, or longer?"</p>
+        <p>"What about your appetite? Has it increased, decreased, or stayed the same? Have you noticed any changes in your taste, or developed any aversions to certain foods? Do you feel full very quickly after eating (early satiety)?"</p>
+        <p>"Can you tell me about your typical eating habits and meal patterns? What do you usually eat for breakfast, lunch, and dinner? Do you snack? How much fluid do you drink in a day? Have you changed your diet recently, perhaps because of other symptoms like difficulty swallowing or nausea?"</p>
+        <p>"How about your exercise levels? Have you been doing more physical activity or a different kind of exercise recently?"</p>
+        <p>"Have you noticed any other symptoms happening with the weight loss? This is very important. For example, have you had any fevers, night sweats, or felt unusually tired or generally unwell? (Constitutional symptoms)</p>
+        <p>"What about any stomach or bowel issues? Have you had difficulty swallowing (dysphagia) or pain when swallowing (odynophagia)? Any abdominal pain, nausea, vomiting, or feeling full quickly? Have you noticed any changes in your bowel habits, such as diarrhoea or constipation? Have you passed any black, tarry stools (melaena), or fresh blood from your back passage? Have you noticed any yellowing of your skin or eyes (jaundice)?"</p>
+        <p>"Regarding your breathing, have you had a cough, or coughed up any blood (haemoptysis)? Are you short of breath?"</p>
+        <p>"What about symptoms related to your hormones? Are you excessively thirsty, passing urine a lot, sensitive to heat or cold, or experiencing palpitations or tremor?"</p>
+        <p>"Have you had any headaches, visual changes, weakness, or numbness (neurological symptoms)?"</p>
+        <p>"How about your mood? Have you been feeling low, anxious, or losing pleasure in things you used to enjoy? Do you have any concerns about your body image?"</p>
+        <p>"Do you have any new or persistent pain anywhere in your body?"</p>
+        <p>"I also need to ask about some important 'red flag' symptoms. Has your weight loss been rapid – more than 5% of your body weight in the last 6 to 12 months? Are you having fevers, night sweats, or severe fatigue that can't be explained? Do you have persistent difficulty or pain when swallowing? Have you had persistent abdominal pain, passed black, tarry stools, or coughed up blood? Have you noticed any unexplained lumps or bumps, or yellowing of your skin/eyes? What about any new neurological symptoms?"</p>
+    </div>
+    <div class="section-box">
+        <h3>❓ Systemic Enquiry</h3>
+        <p>"Are you experiencing any other symptoms anywhere else in your body? This helps us to get a full picture and look for any other clues to the underlying cause of your weight loss."</p>
+    </div>
+    <div class="section-box">
+        <h3>📜 Past Medical & Surgical History</h3>
+        <p>"Do you have any existing medical conditions, such as diabetes (especially if it's new or not well-controlled), thyroid disorders (particularly an overactive thyroid), inflammatory bowel disease like Crohn's or ulcerative colitis, coeliac disease, chronic infections like HIV or tuberculosis, chronic kidney disease, chronic liver disease, or conditions that affect nutrient absorption (malabsorption syndromes)? Do you have any mental health conditions like depression, anxiety, or eating disorders? What about any history of cancer?"</p>
+        <p>"Have you ever had any operations or procedures, especially any surgery on your digestive system, or bariatric surgery for weight loss?"</p>
+        <p>"For women, I'd also like to ask a few questions about your gynaecological history. Are your menstrual periods regular? Have you been pregnant before? Are you currently going through menopause, or have you already?"</p>
+    </div>
+    <div class="section-box">
+        <h3>💊 Drug History & Allergies</h3>
+        <p>"Are you currently taking any medications, including anything prescribed by a doctor, or any over-the-counter medicines, supplements, or herbal remedies? Some medications, like metformin for diabetes, thyroid hormones, stimulants (e.g., for ADHD), certain antidepressants (SSRIs can cause initial weight loss), or chemotherapy, can affect appetite or metabolism."</p>
+        <p>"Have there been any recent changes to your medications?"</p>
+        <p>"Do you have any allergies to medications or anything else? If so, what kind of reaction did you had?"</p>
+    </div>
+    <div class="section-box">
+        <h3>👨‍👩‍👧‍👦 Family & Social History</h3>
+        <p>"Does anyone in your close family – like your parents, siblings, or children – have a history of malignancy (especially gastrointestinal cancers, breast, or ovarian cancer), autoimmune diseases, thyroid disorders, or malabsorption syndromes?"</p>
+        <p>"Could you tell me a little about your living situation and who you live with? Do you have adequate cooking facilities and access to food? Do you have good social support around you? Are you able to manage all your daily activities independently? Have you experienced any recent financial difficulties that might affect your access to food?"</p>
+        <p>"How about your lifestyle? Do you smoke, and if so, how much? How much alcohol do you drink in a week? Do you use any recreational drugs?"</p>
+        <p>"What's your typical diet like, and how about your fluid intake and exercise levels? How do you manage stress?"</p>
+        <p>"Have you travelled recently, especially to areas where certain infections (like tuberculosis or parasitic infections) are common?"</p>
+    </div>
+    <div class="section-box">
+        <h3>✔️ Closing the Consultation</h3>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Summarise key points and check for accuracy.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Ask if any remaining questions or concerns.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Thank the patient.</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Propose next steps (e.g., physical examination, vital signs, anthropometric measurements (weight, height, BMI), blood tests - FBC, U&Es, LFTs, TFTs, CRP, ESR, HbA1c, coeliac screen, tumour markers if indicated; urine dipstick; stool tests; imaging - CXR, abdominal ultrasound, CT scan; endoscopy/colonoscopy; referral to specialist).</span>
+            </div>
+        </label>
+        <label>
+            <input type="checkbox">
+            <div class="checkbox-content">
+                <span>Dispose of PPE and wash hands (if applicable).</span>
+            </div>
+        </label>
+    </div>
+  </div>
+
+    <script>
+// --- MASTER INLINE JAVASCRIPT ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = true;
+        } else {
+            body.classList.remove('dark-mode');
+            if (darkModeToggle) darkModeToggle.checked = false;
+        }
+    };
+
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            const newTheme = darkModeToggle.checked ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem(themeKey, newTheme);
+        });
+    }
+
+    // High-Yield / Full Script Toggle Logic (for content pages)
+    // These functions need to be global or attached to window to be called from onclick attributes.
+    window.toggleSwitch = function(switchEl) { // Make global
+        const isActive = switchEl.classList.toggle('active');
+        document.getElementById('highYieldLabel').classList.toggle('active', !isActive);
+        document.getElementById('fullScriptLabel').classList.toggle('active', isActive);
+        document.getElementById('highYield').classList.toggle('active', !isActive);
+        document.getElementById('fullScript').classList.toggle('active', isActive);
+    }
+
+    window.showContent = function(id) { // Make global
+        const highYieldContent = document.getElementById('highYield');
+        const fullScriptContent = document.getElementById('fullScript');
+        const highYieldLabel = document.getElementById('highYieldLabel');
+        const fullScriptLabel = document.getElementById('fullScriptLabel');
+        const switchEl = document.querySelector('.toggle-container .switch');
+
+        if (id === 'highYield') {
+            highYieldContent.classList.add('active');
+            fullScriptContent.classList.remove('active');
+            highYieldLabel.classList.add('active');
+            fullScriptLabel.classList.remove('active');
+            switchEl.classList.remove('active');
+        } else { // id === 'fullScript'
+            highYieldContent.classList.remove('active');
+            fullScriptContent.classList.add('active');
+            highYieldLabel.classList.remove('active');
+            fullScriptLabel.classList.add('active');
+            switchEl.classList.add('active');
+        }
+    }
+
+    // Initial display for content sections
+    const highYieldContent = document.getElementById('highYield');
+    const fullScriptContent = document.getElementById('fullScript');
+    if (highYieldContent && fullScriptContent) {
+        if (!highYieldContent.classList.contains('active') && !fullScriptContent.classList.contains('active')) {
+            highYieldContent.classList.add('active');
+            document.getElementById('highYieldLabel').classList.add('active');
+        }
+    }
+});
+</script>
+</body>
+</html>
