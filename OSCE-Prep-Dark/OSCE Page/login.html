@@ -80,8 +80,7 @@
             { username: "user1", password: "password1" },
             { username: "john", password: "doe" },
             { username: "AIslim", password: "OSCEPASS2025!" },
-            { username: "TheOneFaze", password: "Salver@619" } // Added new user
-            // Add more user objects here as needed
+            { username: "TheOneFaze", password: "Salver@619" }
         ];
 
         const usernameInput = document.getElementById('usernameInput');
@@ -97,18 +96,17 @@
             for (let i = 0; i < USERS.length; i++) {
                 if (username === USERS[i].username && password === USERS[i].password) {
                     isAuthenticated = true;
-                    break; // Exit the loop once a match is found
+                    break;
                 }
             }
 
             if (isAuthenticated) {
                 // Set 'isAuthenticated' flag in sessionStorage.
-                // This flag WILL be cleared when the browser tab/PWA is closed.
                 sessionStorage.setItem('isAuthenticated', 'true');
                 // Redirect to the main OSCE Page index
-                window.location.href = '/index.html'; // Path confirmed from files.txt
+                window.location.href = '/index.html'; // Path confirmed from file structure
             } else {
-                errorMessage.style.display = 'block'; // Show error message
+                errorMessage.style.display = 'block';
             }
         }
 
@@ -125,47 +123,31 @@
             }
         });
 
-        // 2. Automatic login on autofill (challenging, but best effort)
-        // Browsers handle autofill differently and often don't fire standard events
-        // immediately upon autofill for security/privacy reasons.
-        // The common workaround involves detecting changes after a short delay or
-        // observing specific CSS pseudo-classes or animation events.
-
-        // This approach uses a combination of 'input' and 'change' events, along with
-        // a short delay to check if fields have been autofilled and then triggers login.
-        // It's a "best effort" and may not work perfectly across all browsers/versions.
-
-        // Add 'autocomplete' attributes for better browser autofill hints
-        // <input type="text" id="usernameInput" placeholder="Username" autocomplete="username">
-        // <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
-
         const detectAndLoginIfAutofilled = () => {
-            // Check if both fields have values. This is a basic check.
-            // Some browsers might autofill without triggering immediate JS events.
             if (usernameInput.value.length > 0 && passwordInput.value.length > 0) {
-                // Only attempt login if an error message is not currently displayed,
-                // or if the fields have changed since the last invalid attempt.
                 if (errorMessage.style.display === 'none' || 
                     (usernameInput.value !== sessionStorage.getItem('lastUsername') || passwordInput.value !== sessionStorage.getItem('lastPassword'))) {
                     attemptLogin();
                 }
             }
-            // Store current values to avoid re-attempting login with the same autofilled credentials if they were previously incorrect
             sessionStorage.setItem('lastUsername', usernameInput.value);
             sessionStorage.setItem('lastPassword', passwordInput.value);
         };
 
-        // Listen for 'input' and 'change' events on both fields
         usernameInput.addEventListener('input', detectAndLoginIfAutofilled);
         passwordInput.addEventListener('input', detectAndLoginIfAutofilled);
-        usernameInput.addEventListener('change', detectAndLoginIfAutofilled); // 'change' often fires when focus leaves a field
+        usernameInput.addEventListener('change', detectAndLoginIfAutofilled);
         passwordInput.addEventListener('change', detectAndLoginIfAutofilled);
 
-        // Also, check shortly after page load. This is crucial for autofill on page load.
-        // A slight delay gives the browser time to apply autofill.
         window.addEventListener('load', () => {
-            setTimeout(detectAndLoginIfAutofilled, 200); // Small delay (e.g., 200ms)
-            setTimeout(detectAndLoginIfAutofilled, 700); // A second, slightly longer check
+            // IMPORTANT: If user is already authenticated, redirect them away from login page.
+            // This prevents a logged-in user from seeing the login screen if they navigate back.
+            if (sessionStorage.getItem('isAuthenticated') === 'true') {
+                window.location.href = '/index.html'; // Redirect to the main app page
+            }
+            
+            setTimeout(detectAndLoginIfAutofilled, 200);
+            setTimeout(detectAndLoginIfAutofilled, 700);
         });
 
     </script>
