@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login to OSCE Spark</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9; /* Light background */
+            margin: 0;
+            flex-direction: column; /* Align items in a column */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%; /* Adjust width for responsiveness */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        h1 {
+            color: #0d47a1; /* Dark blue from your theme */
+            margin-bottom: 25px;
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 24px); /* Full width minus padding */
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* Include padding in width */
+            font-size: 1em;
+        }
+        button {
+            background-color: #42a5f5; /* Lighter blue from your theme */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0d47a1; /* Darker blue on hover */
+        }
+        #errorMessage {
+            color: #b71c1c; /* Red for error messages */
+            margin-top: 15px;
+            display: none; /* Hidden by default */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Welcome to OSCE Spark</h1>
+        <p>Please log in to access the checklists.</p>
+        <input type="text" id="usernameInput" placeholder="Username" autocomplete="username">
+        <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+        <button onclick="attemptLogin()">Login</button>
+        <p id="errorMessage">Incorrect username or password. Please try again.</p>
+    </div>
+
+    <script>
+        // !! WARNING: These credentials are hardcoded and visible in the browser's source code. !!
+        // !! This method offers NO SECURITY and is easily bypassed. !!
+        // !! Do NOT use for sensitive content or real user data. !!
+
+        const USERS = [
+            { username: "user1", password: "password1" },
+            { username: "john", password: "doe" },
+            { username: "AIslim", password: "OSCEPASS2025!" },
+            { username: "TheOneFaze", password: "Salver@619" } // Added new user
+            // Add more user objects here as needed
+        ];
+
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMessage = document.getElementById('errorMessage');
+
+        function attemptLogin() {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            
+
+            let isAuthenticated = false;
+            for (let i = 0; i < USERS.length; i++) {
+                if (username === USERS[i].username && password === USERS[i].password) {
+                    isAuthenticated = true;
+                    break; // Exit the loop once a match is found
+                }
+            }
+
+            if (isAuthenticated) {
+                // Set 'isAuthenticated' flag in sessionStorage.
+                // This flag WILL be cleared when the browser tab/PWA is closed.
+                sessionStorage.setItem('isAuthenticated', 'true');
+                // Redirect to the main OSCE Page index
+                window.location.href = '/OSCE-Prep-Dark/index.html'; // Path confirmed from files.txt
+            } else {
+                errorMessage.style.display = 'block'; // Show error message
+            }
+        }
+
+        // 1. Login on Enter key press
+        usernameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                attemptLogin();
+            }
+        });
+
+        passwordInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                attemptLogin();
+            }
+        });
+
+        // 2. Automatic login on autofill (challenging, but best effort)
+        // Browsers handle autofill differently and often don't fire standard events
+        // immediately upon autofill for security/privacy reasons.
+        // The common workaround involves detecting changes after a short delay or
+        // observing specific CSS pseudo-classes or animation events.
+
+        // This approach uses a combination of 'input' and 'change' events, along with
+        // a short delay to check if fields have been autofilled and then triggers login.
+        // It's a "best effort" and may not work perfectly across all browsers/versions.
+
+        // Add 'autocomplete' attributes for better browser autofill hints
+        // <input type="text" id="usernameInput" placeholder="Username" autocomplete="username">
+        // <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+
+        const detectAndLoginIfAutofilled = () => {
+            // Check if both fields have values. This is a basic check.
+            // Some browsers might autofill without triggering immediate JS events.
+            if (usernameInput.value.length > 0 && passwordInput.value.length > 0) {
+                // Only attempt login if an error message is not currently displayed,
+                // or if the fields have changed since the last invalid attempt.
+                if (errorMessage.style.display === 'none' || 
+                    (usernameInput.value !== sessionStorage.getItem('lastUsername') || passwordInput.value !== sessionStorage.getItem('lastPassword'))) {
+                    attemptLogin();
+                }
+            }
+            // Store current values to avoid re-attempting login with the same autofilled credentials if they were previously incorrect
+            sessionStorage.setItem('lastUsername', usernameInput.value);
+            sessionStorage.setItem('lastPassword', passwordInput.value);
+        };
+
+        // Listen for 'input' and 'change' events on both fields
+        usernameInput.addEventListener('input', detectAndLoginIfAutofilled);
+        passwordInput.addEventListener('input', detectAndLoginIfAutofilled);
+        usernameInput.addEventListener('change', detectAndLoginIfAutofilled); // 'change' often fires when focus leaves a field
+        passwordInput.addEventListener('change', detectAndLoginIfAutofilled);
+
+        // Also, check shortly after page load. This is crucial for autofill on page load.
+        // A slight delay gives the browser time to apply autofill.
+        window.addEventListener('load', () => {
+            setTimeout(detectAndLoginIfAutofilled, 200); // Small delay (e.g., 200ms)
+            setTimeout(detectAndLoginIfAutofilled, 700); // A second, slightly longer check
+        });
+
+    </script>
+</body>
+</html>
