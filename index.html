@@ -10,17 +10,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <script>
-        // Check if the user is NOT authenticated for the current session.
-        // This must run before any content is rendered to prevent flicker.
-        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
-            // Redirect to the login page.
-            // Ensure this path is correct relative to the root of your GitHub Pages site.
-            window.location.href = '/OSCE-Prep-Dark/OSCE Page/login.html';
-        }
-        // The 'isAuthenticated' flag will persist in sessionStorage until the tab/PWA is closed.
-    </script>
-
     <style>
 /* --- MASTER INLINE STYLES --- */
 
@@ -852,7 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (highYieldContent) highYieldContent.classList.remove('active');
             if (fullScriptContent) fullScriptContent.classList.add('active');
             if (highYieldLabel) highYieldLabel.classList.remove('active');
-            if (fullScriptLabel) fullScriptLabel.classList.add('active');
+            if (fullScriptLabel) fullScriptLabel.classList.remove('active');
             if (switchEl) switchEl.classList.add('active');
         }
     }
@@ -1061,15 +1050,5 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSearchDisplay(); // Call on initial load to set correct display
 });
 </script>
-<script>
-        // Check if the user is NOT authenticated for the current session.
-        // This must run before any content is rendered to prevent flicker.
-        if (sessionStorage.getItem('isAuthenticated') !== 'true') {
-            // Redirect to the login page.
-            // Ensure this path is correct relative to the root of your GitHub Pages site.
-            window.location.href = '/OSCE-Prep-Dark/OSCE Page/login.html';
-        }
-        // The 'isAuthenticated' flag will persist in sessionStorage until the tab/PWA is closed.
-    </script>
 </body>
 </html>
